@@ -11,7 +11,12 @@ app.use(morgan("dev")); // Log requests to the console (Express 4)
 // Initialize cors 
 app.use(cors())
 
-
+// Initialize staff route
+routeSync(app, "staff");
+// initialize academic route
+routeSync(app, "academic");
+// initialize student route
+routeSync(app, "students");
 
 // Define a default route
 app.get("/", (req, res) => {
