@@ -1,7 +1,7 @@
 {
-  "name": "school-management-system",
+  "name": "school-management-application",
   "version": "1.0.0",
-  "description": "School management system",
+  "description": "School management application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -10,9 +10,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/iamtonmoy0/school-management-system"
+    "url": "https://github.com/nitishkumarnitc/scaler-project"
   },
-  "author": "",
+  "author": "Nitish Kumar",
   "license": "MIT",
   "devDependencies": {
     "morgan": "^1.10.0",
