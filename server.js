@@ -4,6 +4,7 @@ require("dotenv").config();
 require("colors");
 // database connection
 require("./config/db_connect");
+require("./config/redis_connect")
 // ports
 const port = process.env.PORT || 3001;
 // initialize server
