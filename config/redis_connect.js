@@ -4,24 +4,36 @@ const util = require("util");
 let redisClient;
 
 // Handle connection events
-function redis_connect() {
+async function redis_connect() {
     console.log("Connecting to Redis...");
 
-    // Create a Redis client and connect to the local Redis instance
-     redisClient = redis.createClient({
-        host: process.env.REDIS_HOST || '127.0.0.1', // Default to localhost if not set
-        port: process.env.REDIS_PORT || 6379          // Default to Redis port if not set
-    });
-    redisClient.on('connect', () => {
-        console.log('Connected to Redis');
-    });
+    try {
+        // Create a Redis client
+        redisClient = redis.createClient({
+            host: process.env.REDIS_HOST || '127.0.0.1', // Default to localhost if not set
+            port: process.env.REDIS_PORT || 6379          // Default to Redis port if not set
+        });
 
-    redisClient.on('error', (err) => {
-        console.error('Redis error:', err);
-    });
+        // Promisify the get method for async/await usage
+        redisClient.get = util.promisify(redisClient.get).bind(redisClient);
 
-    // Promisify the get method for async/await usage
-    redisClient.get = util.promisify(redisClient.get).bind(redisClient);
+        // Await the connection with a promise
+        await new Promise((resolve, reject) => {
+            redisClient.on('connect', () => {
+                console.log('Connected to Redis');
+                resolve(redisClient); // Resolve the promise with the Redis client
+            });
+
+            redisClient.on('error', (err) => {
+                console.error('Redis error:', err);
+                reject(err); // Reject the promise on error
+            });
+        });
+        redisClient.get = util.promisify(redisClient.get).bind(redisClient);
+    } catch (error) {
+        console.error('Failed to create Redis client:', error);
+        throw error; // Re-throw the error for further handling
+    }
 }
 
 redis_connect();
