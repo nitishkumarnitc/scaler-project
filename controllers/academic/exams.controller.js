@@ -9,7 +9,7 @@ const {
 /**
  * @desc Create new exam
  * @route POST /api/v1/exams
- * @access Private (Teacher Only)
+ * @access Private (Instructor Only)
  **/
 exports.createExamController = async (req, res) => {
   try {
@@ -22,7 +22,7 @@ exports.createExamController = async (req, res) => {
 /**
  * @desc Get all exams
  * @route GET /api/v1/exams
- * @access Private (Teacher Only)
+ * @access Private (Instructor Only)
  **/
 exports.getAllExamController = async (req, res) => {
   try {
@@ -36,7 +36,7 @@ exports.getAllExamController = async (req, res) => {
 /**
  * @desc Get exam by ID
  * @route GET /api/v1/exams/:examId
- * @access Private (Teacher Only)
+ * @access Private (Instructor Only)
  **/
 exports.getExamByIdController = async (req, res) => {
   try {
@@ -50,7 +50,7 @@ exports.getExamByIdController = async (req, res) => {
 /**
  * @desc Update Exam
  * @route PATCH /api/v1/exams/:id
- * @access Private (Teacher Only)
+ * @access Private (Instructor Only)
  **/
 exports.updateExamController = async (req, res) => {
   try {

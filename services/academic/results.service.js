@@ -39,20 +39,20 @@ exports.studentCheckExamResultService = async (examId, studentId, res) => {
 };
 
 /**
- * Service to get all exam results for a class by a teacher using caching
+ * Service to get all exam results for a class by a instructor using caching
  * @param {string} classId - The ID of the class
- * @param {string} teacherId - The ID of the teacher
+ * @param {string} instructorId - The ID of the instructor
  * @param {Object} res - Express response object
  */
-exports.getAllExamResultsService = async (classId, teacherId, res) => {
+exports.getAllExamResultsService = async (classId, instructorId, res) => {
   const query = { classLevel: classId };
 
   try {
     // Use the `findWithCache` method to fetch class exam results
     const results = await ExamResult.findWithCache(query);
 
-    // Ensure the teacher has access to the results
-    if (results.length && results[0].teacher.equals(teacherId)) {
+    // Ensure the instructor has access to the results
+    if (results.length && results[0].instructor.equals(instructorId)) {
       return responseStatus(res, 200, "success", results);
     } else {
       return responseStatus(res, 401, "fail", "Unauthorized access");

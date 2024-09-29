@@ -2,7 +2,7 @@ const express = require("express");
 const examRouter = express.Router();
 // middlewares
 const isLoggedIn = require("../../../middlewares/is_logged_in");
-const isTeacher = require("../../../middlewares/is_teacher");
+const isInstructor = require("../../../middlewares/is_instructor");
 // controller
 const {
   createExamController,
@@ -10,14 +10,14 @@ const {
   getExamByIdController,
   updateExamController,
 } = require("../../../controllers/academic/exams.controller");
-// teacher create exam
+// instructor create exam
 examRouter
   .route("/exams")
-  .get(isLoggedIn, isTeacher, getAllExamController)
-  .post(isLoggedIn, isTeacher, createExamController);
+  .get(isLoggedIn, isInstructor, getAllExamController)
+  .post(isLoggedIn, isInstructor, createExamController);
 examRouter
   .route("/exams/:examId")
-  .get(isLoggedIn, isTeacher, getExamByIdController)
-  .patch(isLoggedIn, isTeacher, updateExamController);
+  .get(isLoggedIn, isInstructor, getExamByIdController)
+  .patch(isLoggedIn, isInstructor, updateExamController);
 
 module.exports = examRouter;

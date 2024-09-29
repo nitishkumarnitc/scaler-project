@@ -1,7 +1,7 @@
 # School Management Application
 
 ## Description
-This is a school management application built with Node.js and Express. It provides a backend API for managing various aspects of a school, including students, teachers, classes, and academic records.
+This is a school management application built with Node.js and Express. It provides a backend API for managing various aspects of a school, including students, instructors, classes, and academic records.
 
 ## Installation
 

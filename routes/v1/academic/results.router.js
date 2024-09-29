@@ -3,7 +3,7 @@ const resultsRouter = express.Router();
 // middleware
 const isLoggedIn = require("../../../middlewares/is_logged_in");
 const isStudent = require("../../../middlewares/is_student");
-const isTeacher = require("../../../middlewares/is_teacher");
+const isInstructor = require("../../../middlewares/is_instructor");
 // controllers
 const {
   studentCheckExamResultController,
@@ -13,9 +13,9 @@ const {
 resultsRouter
   .route("/exam-result/:examId/check")
   .post(isLoggedIn, isStudent, studentCheckExamResultController);
-//   Teacher get all exam result
+//   Instructor get all exam result
 resultsRouter
   .route("/exam-results/:classLevelId")
-  .get(isLoggedIn, isTeacher, getAllExamResultsController);
+  .get(isLoggedIn, isInstructor, getAllExamResultsController);
 
 module.exports = resultsRouter;

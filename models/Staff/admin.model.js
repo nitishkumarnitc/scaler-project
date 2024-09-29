@@ -50,10 +50,10 @@ const adminSchema = new mongoose.Schema(
         ref: "ClassLevel",
       },
     ],
-    teachers: [
+    instructors: [
       {
         type: ObjectId,
-        ref: "Teacher",
+        ref: "Instructor",
       },
     ],
     students: [

@@ -72,7 +72,7 @@ const examSchema = new mongoose.Schema(
         },
         createdBy: {
             type: ObjectId,
-            ref: "Teacher",
+            ref: "Instructor",
             required: true,
         },
         academicTerm: {
@@ -111,7 +111,7 @@ const getAllExams = async () => {
     return exams;
 };
 
-const createExam = async (data, teacherId) => {
+const createExam = async (data, instructorId) => {
     const {
         name,
         description,
@@ -143,7 +143,7 @@ const createExam = async (data, teacherId) => {
         duration,
         examDate,
         examTime,
-        createdBy: teacherId,
+        createdBy: instructorId,
     });
 
     // Clear the cache

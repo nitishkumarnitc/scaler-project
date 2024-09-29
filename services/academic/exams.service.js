@@ -1,11 +1,11 @@
 // Import necessary models
-const Teacher = require("../../models/Staff/teachers.model");
+const Instructor = require("../../models/Staff/instructors.model");
 const { Exam, getAllExams } = require("../../models/Academic/exams.model"); // Use the Exam model and getAllExams
 // Import responseStatus handler
 const responseStatus = require("../../handlers/response_status.handler");
 
 /**
- * Create exam service by a teacher.
+ * Create exam service by a instructor.
  *
  * @param {Object} data - The data containing information about the exam.
  * @param {string} data.name - The name of the exam.
@@ -18,10 +18,10 @@ const responseStatus = require("../../handlers/response_status.handler");
  * @param {number} data.duration - The duration of the exam.
  * @param {string} data.examDate - The date of the exam.
  * @param {string} data.examTime - The time of the exam.
- * @param {string} teacherId - The ID of the teacher creating the exam.
+ * @param {string} instructorId - The ID of the instructor creating the exam.
  * @returns {Object} - The response object indicating success or failure.
  */
-exports.createExamService = async (data, teacherId) => {
+exports.createExamService = async (data, instructorId) => {
   const {
     name,
     description,
@@ -35,10 +35,10 @@ exports.createExamService = async (data, teacherId) => {
     examTime,
   } = data;
 
-  // Find the teacher
-  const teacherExist = await Teacher.findById(teacherId);
-  if (!teacherExist)
-    return responseStatus(res, 401, "failed", "Teacher not found!");
+  // Find the instructor
+  const instructorExist = await Instructor.findById(instructorId);
+  if (!instructorExist)
+    return responseStatus(res, 401, "failed", "Instructor not found!");
 
   // Check if the exam already exists
   const examExist = await Exam.findOne({ name });
@@ -57,12 +57,12 @@ exports.createExamService = async (data, teacherId) => {
     duration,
     examDate,
     examTime,
-    createdBy: teacherExist._id,
+    createdBy: instructorExist._id,
   });
 
-  // Save exam ID to the teacher collection
-  teacherExist.examsCreated.push(examCreate._id);
-  await teacherExist.save();
+  // Save exam ID to the instructor collection
+  instructorExist.examsCreated.push(examCreate._id);
+  await instructorExist.save();
 
   // Clear the cache after creating a new exam
   await redisClient.del("exams_cache");

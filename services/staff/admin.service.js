@@ -120,7 +120,7 @@ exports.getSingleProfileService = async (id, res) => {
       .populate("programs")
       .populate("academicYears")
       .populate("yearGroups")
-      .populate("teachers")
+      .populate("instructors")
       .populate("classLevel")
       .populate("students");
 

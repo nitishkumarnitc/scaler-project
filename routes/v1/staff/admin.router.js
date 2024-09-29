@@ -5,10 +5,10 @@ const {
   getAdminsController,
   updateAdminController,
   deleteAdminController,
-  adminSuspendTeacherController,
-  adminUnSuspendTeacherController,
-  adminWithdrawTeacherController,
-  adminUnWithdrawTeacherController,
+  adminSuspendInstructorController,
+  adminUnSuspendInstructorController,
+  adminWithdrawInstructorController,
+  adminUnWithdrawInstructorController,
   adminUnPublishResultsController,
   getAdminProfileController,
 } = require("../../../controllers/staff/admin.controller");
@@ -32,22 +32,22 @@ adminRouter
   .route("/admin/:id")
   .put(isLoggedIn, isAdmin, updateAdminController)
   .delete(deleteAdminController);
-// admin suspend a teacher
+// admin suspend a instructor
 adminRouter
-  .route("/admins/suspend/teacher/:id")
-  .put(adminSuspendTeacherController);
-// admin unsuspend a teacher
+  .route("/admins/suspend/instructor/:id")
+  .put(adminSuspendInstructorController);
+// admin unsuspend a instructor
 adminRouter
-  .route("/admins/unsuspend/teacher/:id")
-  .put(adminUnSuspendTeacherController);
-//  admin withdraws a teacher
+  .route("/admins/unsuspend/instructor/:id")
+  .put(adminUnSuspendInstructorController);
+//  admin withdraws a instructor
 adminRouter
-  .route("/admins/withdraw/teacher/:id")
-  .put(adminWithdrawTeacherController);
-// admin un-withdraws a teacher
+  .route("/admins/withdraw/instructor/:id")
+  .put(adminWithdrawInstructorController);
+// admin un-withdraws a instructor
 adminRouter
-  .route("/admins/unwithdraw/teacher/:id")
-  .put(adminUnWithdrawTeacherController);
+  .route("/admins/unwithdraw/instructor/:id")
+  .put(adminUnWithdrawInstructorController);
 // admin publish result
 adminRouter
   .route("/admins/publish/result/:id")

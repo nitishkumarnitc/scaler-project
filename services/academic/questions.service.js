@@ -14,11 +14,11 @@ const Questions = require("../../models/Academic/questions.model");
  * @param {string} data.optionD - Option D for the question.
  * @param {string} data.correctAnswer - The correct answer for the question.
  * @param {string} examId - The ID of the exam the question is associated with.
- * @param {string} teacherId - The ID of the teacher creating the question.
+ * @param {string} instructorId - The ID of the instructor creating the question.
  * @param {Object} res - The response object.
  * @returns {Object} - The response object indicating success or failure.
  */
-exports.createQuestionsService = async (data, examId, teacherId, res) => {
+exports.createQuestionsService = async (data, examId, instructorId, res) => {
   const { question, optionA, optionB, optionC, optionD, correctAnswer } = data;
 
   // Finding the exam
@@ -40,7 +40,7 @@ exports.createQuestionsService = async (data, examId, teacherId, res) => {
     optionC,
     optionD,
     correctAnswer,
-    createdBy: teacherId,
+    createdBy: instructorId,
   });
 
   // If question is created successfully

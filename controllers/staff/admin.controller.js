@@ -90,15 +90,15 @@ exports.deleteAdminController = (req, res) => {
 };
 
 /**
- * @desc Admin suspends a teacher
- * @route PUT /api/v1/admins/suspend/teacher/:id
+ * @desc Admin suspends a instructor
+ * @route PUT /api/v1/admins/suspend/instructor/:id
  * @access Private
  **/
-exports.adminSuspendTeacherController = (req, res) => {
+exports.adminSuspendInstructorController = (req, res) => {
   try {
     res.status(201).json({
       status: "success",
-      data: "admin suspend teacher",
+      data: "admin suspend instructor",
     });
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);
@@ -106,15 +106,15 @@ exports.adminSuspendTeacherController = (req, res) => {
 };
 
 /**
- * @desc Admin unsuspends a teacher
- * @route PUT /api/v1/admins/unsuspend/teacher/:id
+ * @desc Admin unsuspends a instructor
+ * @route PUT /api/v1/admins/unsuspend/instructor/:id
  * @access Private
  **/
-exports.adminUnSuspendTeacherController = (req, res) => {
+exports.adminUnSuspendInstructorController = (req, res) => {
   try {
     res.status(201).json({
       status: "success",
-      data: "admin unsuspend teacher",
+      data: "admin unsuspend instructor",
     });
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);
@@ -122,15 +122,15 @@ exports.adminUnSuspendTeacherController = (req, res) => {
 };
 
 /**
- * @desc Admin withdraws a teacher
- * @route PUT /api/v1/admins/withdraw/teacher/:id
+ * @desc Admin withdraws a instructor
+ * @route PUT /api/v1/admins/withdraw/instructor/:id
  * @access Private
  **/
-exports.adminWithdrawTeacherController = (req, res) => {
+exports.adminWithdrawInstructorController = (req, res) => {
   try {
     res.status(201).json({
       status: "success",
-      data: "admin withdraw teacher",
+      data: "admin withdraw instructor",
     });
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);
@@ -138,15 +138,15 @@ exports.adminWithdrawTeacherController = (req, res) => {
 };
 
 /**
- * @desc Admin un-withdraws a teacher
- * @route PUT /api/v1/admins/unwithdraw/teacher/:id
+ * @desc Admin un-withdraws a instructor
+ * @route PUT /api/v1/admins/unwithdraw/instructor/:id
  * @access Private
  **/
-exports.adminUnWithdrawTeacherController = (req, res) => {
+exports.adminUnWithdrawInstructorController = (req, res) => {
   try {
     res.status(201).json({
       status: "success",
-      data: "admin un-withdraw teacher",
+      data: "admin un-withdraw instructor",
     });
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);

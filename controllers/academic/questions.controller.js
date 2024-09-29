@@ -9,7 +9,7 @@ const {
 /**
  * @desc Create Question
  * @route POST /questions/:examId/create
- * @access Private (Teachers Only)
+ * @access Private (Instructors Only)
  **/
 exports.createQuestionsController = async (req, res) => {
   try {
@@ -22,7 +22,7 @@ exports.createQuestionsController = async (req, res) => {
 /**
  * @desc Get all questions
  * @route GET /api/v1/questions
- * @access Private - Teacher only
+ * @access Private - Instructor only
  **/
 exports.getAllQuestionsController = async (req, res) => {
   try {
@@ -50,7 +50,7 @@ exports.getQuestionByIdController = async (req, res) => {
 /**
  * @desc Update Question
  * @route PATCH /api/v1/questions/:id
- * @access Private Teacher only
+ * @access Private Instructor only
  **/
 exports.updateQuestionController = async (req, res) => {
   try {

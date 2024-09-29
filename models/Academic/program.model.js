@@ -39,10 +39,10 @@ const ProgramSchema = new mongoose.Schema(
             ref: "Admin",
             required: true,
         },
-        teachers: [
+        instructors: [
             {
                 type: ObjectId,
-                ref: "Teacher",
+                ref: "Instructor",
             },
         ],
         students: [

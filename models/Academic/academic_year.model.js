@@ -33,10 +33,10 @@ const academicYearSchema = new mongoose.Schema(
                 ref: "Student",
             },
         ],
-        teachers: [
+        instructors: [
             {
                 type: ObjectId,
-                ref: "Teacher",
+                ref: "Instructor",
             },
         ],
     },

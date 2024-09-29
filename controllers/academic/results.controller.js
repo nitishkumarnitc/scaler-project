@@ -24,7 +24,7 @@ exports.studentCheckExamResultController = async (req, res) => {
 /**
  * @desc Get all exam results
  * @route Get /api/v1/exam-results/:classLevelId
- * @access Private (teachers only)
+ * @access Private (instructors only)
  **/
 exports.getAllExamResultsController = async (req, res) => {
   try {

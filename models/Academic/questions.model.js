@@ -38,7 +38,7 @@ const questionSchema = new mongoose.Schema(
         },
         createdBy: {
             type: ObjectId,
-            ref: "Teacher",
+            ref: "Instructor",
             required: true,
         },
     },

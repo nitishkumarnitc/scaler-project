@@ -50,9 +50,9 @@ const examResultSchema = new mongoose.Schema(
         position: {
             type: Number,
         },
-        teacher: {
+        instructor: {
             type: ObjectId,
-            ref: "Teacher",
+            ref: "Instructor",
             required: true,
         },
         subject: {

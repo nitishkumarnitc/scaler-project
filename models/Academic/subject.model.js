@@ -14,9 +14,9 @@ const subjectSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        teacher: {
+        instructor: {
             type: ObjectId,
-            ref: "Teacher",
+            ref: "Instructor",
         },
         academicTerm: {
             type: ObjectId,

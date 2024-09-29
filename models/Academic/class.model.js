@@ -32,10 +32,10 @@ const ClassLevelSchema = new mongoose.Schema(
                 ref: "Subject",
             },
         ],
-        teachers: [
+        instructors: [
             {
                 type: ObjectId,
-                ref: "Teacher",
+                ref: "Instructor",
             },
         ],
     },
