@@ -8,7 +8,7 @@ const {
 /**
  * @desc Checking exam results
  * @route Post /api/v1/exam-result/:examId/check
- * @access Private (students only)
+ * @access Private (learners only)
  **/
 exports.studentCheckExamResultController = async (req, res) => {
   try {

@@ -18,11 +18,11 @@ const ClassLevelSchema = new mongoose.Schema(
             ref: "Admin",
             required: true,
         },
-        // students will be added to the class level when they are registered
-        students: [
+        // learners will be added to the class level when they are registered
+        learners: [
             {
                 type: ObjectId,
-                ref: "Student",
+                ref: "Learner",
             },
         ],
         // optional.

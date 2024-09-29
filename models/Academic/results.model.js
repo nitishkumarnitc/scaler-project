@@ -7,9 +7,9 @@ const CACHE_EXPIRATION = 3600; // Cache expiration time in seconds (1 hour)
 // Exam result schema
 const examResultSchema = new mongoose.Schema(
     {
-        student: {
+        learner: {
             type: ObjectId,
-            ref: "Student",
+            ref: "Learner",
             required: true,
         },
         exam: {

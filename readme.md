@@ -1,7 +1,7 @@
 # School Management Application
 
 ## Description
-This is a school management application built with Node.js and Express. It provides a backend API for managing various aspects of a school, including students, instructors, classes, and academic records.
+This is a school management application built with Node.js and Express. It provides a backend API for managing various aspects of a school, including learners, instructors, classes, and academic records.
 
 ## Installation
 
@@ -47,8 +47,8 @@ The server will start on the port specified in your `.env` file (default is 5130
 (List your API endpoints here, e.g.:)
 - POST /api/auth/register
 - POST /api/auth/login
-- GET /api/students
-- POST /api/students
+- GET /api/learners
+- POST /api/learners
 
 ## Dependencies
 

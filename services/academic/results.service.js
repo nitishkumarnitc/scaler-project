@@ -2,13 +2,13 @@ const responseStatus = require("../../handlers/response_status.handler");
 const ExamResult = require("../../models/Academic/results.model");
 
 /**
- * Service to check exam result for a student using caching
+ * Service to check exam result for a learner using caching
  * @param {string} examId - The ID of the exam
- * @param {string} studentId - The ID of the student
+ * @param {string} studentId - The ID of the learner
  * @param {Object} res - Express response object
  */
 exports.studentCheckExamResultService = async (examId, studentId, res) => {
-  const query = { exam: examId, student: studentId };
+  const query = { exam: examId, learner: studentId };
 
   try {
     // Use the `findWithCache` method to fetch the exam result, leveraging Redis cache

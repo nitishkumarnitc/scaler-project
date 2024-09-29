@@ -15,8 +15,8 @@ app.use(cors())
 routeSync(app, "staff");
 // initialize academic route
 routeSync(app, "academic");
-// initialize student route
-routeSync(app, "students");
+// initialize learner route
+routeSync(app, "learners");
 
 // Define a default route
 app.get("/", (req, res) => {

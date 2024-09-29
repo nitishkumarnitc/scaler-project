@@ -122,7 +122,7 @@ exports.getSingleProfileService = async (id, res) => {
       .populate("yearGroups")
       .populate("instructors")
       .populate("classLevel")
-      .populate("students");
+      .populate("learners");
 
   if (!user) {
     return responseStatus(res, 201, "failed", "Admin doesn't exist ");

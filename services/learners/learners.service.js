@@ -3,7 +3,7 @@ const {
   isPassMatched,
 } = require("../../handlers/pass_hash.handler");
 const Admin = require("../../models/Staff/admin.model");
-const Student = require("../../models/Students/students.model");
+const Learner = require("../../models/Learners/learners.model");
 const Exam = require("../../models/Academic/exams.model");
 const Results = require("../../models/Academic/results.model");
 const generateToken = require("../../utils/token_generator");
@@ -12,16 +12,16 @@ const { resultCalculate } = require("../../functions/result_calculate.function")
 const redisClient = require("../../config/redis_connect"); // Assuming you have a Redis client set up
 
 /**
- * Admin registration service for creating a new student.
+ * Admin registration service for creating a new learner.
  *
- * @param {Object} data - The data containing information about the new student.
- * @param {string} data.name - The name of the student.
- * @param {string} data.email - The email of the student.
- * @param {string} data.password - The password of the student.
+ * @param {Object} data - The data containing information about the new learner.
+ * @param {string} data.name - The name of the learner.
+ * @param {string} data.email - The email of the learner.
+ * @param {string} data.password - The password of the learner.
  * @param {Object} res - The Express response object.
  * @returns {Object} - The response object indicating success or failure.
  */
-exports.adminRegisterStudentService = async (data, adminId, res) => {
+exports.adminRegisterLearnerService = async (data, adminId, res) => {
   const { name, email, password } = data;
 
   // Finding admin
@@ -30,35 +30,35 @@ exports.adminRegisterStudentService = async (data, adminId, res) => {
     return responseStatus(res, 405, "failed", "Unauthorized access!");
   }
 
-  // Check if student already exists
-  const student = await Student.findOne({ email });
-  if (student) {
-    return responseStatus(res, 402, "failed", "Student already enrolled");
+  // Check if learner already exists
+  const learner = await Learner.findOne({ email });
+  if (learner) {
+    return responseStatus(res, 402, "failed", "Learner already enrolled");
   }
 
   // Hash password
   const hashedPassword = await hashPassword(password);
 
-  // Create student
-  const studentRegistered = await Student.create({
+  // Create learner
+  const studentRegistered = await Learner.create({
     name,
     email,
     password: hashedPassword,
   });
 
   // Saving to admin
-  admin.students.push(studentRegistered._id);
+  admin.learners.push(studentRegistered._id);
   await admin.save();
 
   return responseStatus(res, 200, "success", studentRegistered);
 };
 
 /**
- * Student login service.
+ * Learner login service.
  *
  * @param {Object} data - The data containing information about the login.
- * @param {string} data.email - The email of the student.
- * @param {string} data.password - The password of the student.
+ * @param {string} data.email - The email of the learner.
+ * @param {string} data.password - The password of the learner.
  * @param {Object} res - The Express response object.
  * @returns {Object} - The response object indicating success or failure.
  */
@@ -66,105 +66,105 @@ exports.studentLoginService = async (data, res) => {
   const { email, password } = data;
 
   // Find the user
-  const student = await Student.findOne({ email }).select("-password ");
-  if (!student) {
+  const learner = await Learner.findOne({ email }).select("-password ");
+  if (!learner) {
     return responseStatus(res, 402, "failed", "Invalid login credentials");
   }
 
   // Verify the password
-  const isMatched = await isPassMatched(password, student?.password);
+  const isMatched = await isPassMatched(password, learner?.password);
   if (!isMatched) {
     return responseStatus(res, 401, "failed", "Invalid login credentials");
   }
 
-  const responseData = { student, token: generateToken(student._id) };
+  const responseData = { learner, token: generateToken(learner._id) };
   return responseStatus(res, 200, "success", responseData);
 };
 
 /**
- * Get student profile service.
+ * Get learner profile service.
  *
- * @param {string} id - The ID of the student.
+ * @param {string} id - The ID of the learner.
  * @param {Object} res - The Express response object.
  * @returns {Object} - The response object indicating success or failure.
  */
-exports.getStudentsProfileService = async (id, res) => {
-  const cacheKey = `student:${id}`;
+exports.getLearnersProfileService = async (id, res) => {
+  const cacheKey = `learner:${id}`;
 
   // Check the cache first
-  const cachedStudent = await redisClient.get(cacheKey);
-  if (cachedStudent) {
-    return responseStatus(res, 200, "success", JSON.parse(cachedStudent));
+  const cachedLearner = await redisClient.get(cacheKey);
+  if (cachedLearner) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedLearner));
   }
 
-  const student = await Student.findById(id).select(
+  const learner = await Learner.findById(id).select(
       "-password -createdAt -updatedAt"
   );
 
-  if (!student) {
-    return responseStatus(res, 402, "failed", "Student not found");
+  if (!learner) {
+    return responseStatus(res, 402, "failed", "Learner not found");
   }
 
   // Cache the result
-  await redisClient.set(cacheKey, JSON.stringify(student), "EX", 3600); // Cache for 1 hour
-  return responseStatus(res, 200, "success", student);
+  await redisClient.set(cacheKey, JSON.stringify(learner), "EX", 3600); // Cache for 1 hour
+  return responseStatus(res, 200, "success", learner);
 };
 
 /**
- * Get all students service (for admin use).
+ * Get all learners service (for admin use).
  *
  * @param {Object} res - The Express response object.
- * @returns {Array} - An array of all students.
+ * @returns {Array} - An array of all learners.
  */
-exports.getAllStudentsByAdminService = async (res) => {
-  const cacheKey = "students";
+exports.getAllLearnersByAdminService = async (res) => {
+  const cacheKey = "learners";
 
-  // Check the cache for students
-  const cachedStudents = await redisClient.get(cacheKey);
-  if (cachedStudents) {
-    return responseStatus(res, 200, "success", JSON.parse(cachedStudents));
+  // Check the cache for learners
+  const cachedLearners = await redisClient.get(cacheKey);
+  if (cachedLearners) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedLearners));
   }
 
   // Retrieve from the database if not cached
-  const students = await Student.find({}).select("-password -createdAt -updatedAt");
+  const learners = await Learner.find({}).select("-password -createdAt -updatedAt");
 
   // Cache the result
-  await redisClient.set(cacheKey, JSON.stringify(students), "EX", 3600); // Cache for 1 hour
+  await redisClient.set(cacheKey, JSON.stringify(learners), "EX", 3600); // Cache for 1 hour
 
-  return responseStatus(res, 200, "success", students);
+  return responseStatus(res, 200, "success", learners);
 };
 
 /**
- * Get a single student by admin.
+ * Get a single learner by admin.
  *
- * @param {string} studentID - The ID of the student.
+ * @param {string} studentID - The ID of the learner.
  * @param {Object} res - The Express response object.
  * @returns {Object} - The response object indicating success or failure.
  */
-exports.getStudentByAdminService = async (studentID, res) => {
-  const cacheKey = `student:${studentID}`;
+exports.getLearnerByAdminService = async (studentID, res) => {
+  const cacheKey = `learner:${studentID}`;
 
   // Check the cache first
-  const cachedStudent = await redisClient.get(cacheKey);
-  if (cachedStudent) {
-    return responseStatus(res, 200, "success", JSON.parse(cachedStudent));
+  const cachedLearner = await redisClient.get(cacheKey);
+  if (cachedLearner) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedLearner));
   }
 
-  const student = await Student.findById(studentID);
-  if (!student) {
-    return responseStatus(res, 402, "failed", "Student not found");
+  const learner = await Learner.findById(studentID);
+  if (!learner) {
+    return responseStatus(res, 402, "failed", "Learner not found");
   }
 
   // Cache the result
-  await redisClient.set(cacheKey, JSON.stringify(student), "EX", 3600); // Cache for 1 hour
-  return responseStatus(res, 200, "success", student);
+  await redisClient.set(cacheKey, JSON.stringify(learner), "EX", 3600); // Cache for 1 hour
+  return responseStatus(res, 200, "success", learner);
 };
 
 /**
- * Student update profile service.
+ * Learner update profile service.
  *
  * @param {Object} data - The data containing information about the updated profile.
- * @param {string} userId - The ID of the student.
+ * @param {string} userId - The ID of the learner.
  * @param {Object} res - The Express response object.
  * @returns {Object} - The response object indicating success or failure.
  */
@@ -172,14 +172,14 @@ exports.studentUpdateProfileService = async (data, userId, res) => {
   const { email, password } = data;
 
   // If email is taken
-  const emailExist = await Student.findOne({ email });
+  const emailExist = await Learner.findOne({ email });
   if (emailExist) {
     return responseStatus(res, 402, "failed", "This email is taken/exist");
   }
 
   // Hash password and update
   if (password) {
-    const student = await Student.findByIdAndUpdate(
+    const learner = await Learner.findByIdAndUpdate(
         userId,
         {
           email,
@@ -190,9 +190,9 @@ exports.studentUpdateProfileService = async (data, userId, res) => {
           runValidators: true,
         }
     );
-    return responseStatus(res, 200, "success", student);
+    return responseStatus(res, 200, "success", learner);
   } else {
-    const student = await Student.findByIdAndUpdate(
+    const learner = await Learner.findByIdAndUpdate(
         userId,
         { email },
         {
@@ -200,29 +200,29 @@ exports.studentUpdateProfileService = async (data, userId, res) => {
           runValidators: true,
         }
     );
-    return responseStatus(res, 200, "success", student);
+    return responseStatus(res, 200, "success", learner);
   }
 };
 
 /**
- * Admin update Student service.
+ * Admin update Learner service.
  *
- * @param {Object} data - The data containing information about the updated student.
- * @param {string} studentId - The ID of the student.
+ * @param {Object} data - The data containing information about the updated learner.
+ * @param {string} studentId - The ID of the learner.
  * @param {Object} res - The Express response object.
  * @returns {Object} - The response object indicating success or failure.
  */
-exports.adminUpdateStudentService = async (data, studentId, res) => {
+exports.adminUpdateLearnerService = async (data, studentId, res) => {
   const { classLevels, academicYear, program, name, email, prefectName } = data;
 
-  // Find the student by id
-  const studentFound = await Student.findById(studentId);
+  // Find the learner by id
+  const studentFound = await Learner.findById(studentId);
   if (!studentFound) {
-    return responseStatus(res, 402, "failed", "Student not found");
+    return responseStatus(res, 402, "failed", "Learner not found");
   }
 
   // Update
-  const studentUpdated = await Student.findByIdAndUpdate(
+  const studentUpdated = await Learner.findByIdAndUpdate(
       studentId,
       {
         $set: {
@@ -242,17 +242,17 @@ exports.adminUpdateStudentService = async (data, studentId, res) => {
   );
 
   // Invalidate the cache
-  await redisClient.del(`student:${studentId}`);
-  await redisClient.del("students"); // Optional: Clear all students cache
+  await redisClient.del(`learner:${studentId}`);
+  await redisClient.del("learners"); // Optional: Clear all learners cache
 
   return responseStatus(res, 200, "success", studentUpdated);
 };
 
 /**
- * Student write exam service.
+ * Learner write exam service.
  *
  * @param {string} data - The data containing information about the exam writing
- * @param {string} studentId - The ID of the student.
+ * @param {string} studentId - The ID of the learner.
  * @param {string} examId - The ID of the exam.
  * @param {Object} res - The Express response object.
  * @returns {void}
@@ -260,9 +260,9 @@ exports.adminUpdateStudentService = async (data, studentId, res) => {
 exports.studentWriteExamService = async (data, studentId, examId, res) => {
   const { answers } = data;
 
-  // Find the student
-  const student = await Student.findById(studentId);
-  if (!student) return responseStatus(res, 404, "failed", "Student not found");
+  // Find the learner
+  const learner = await Learner.findById(studentId);
+  if (!learner) return responseStatus(res, 404, "failed", "Learner not found");
 
   // Finding the exam
   const findExam = await Exam.findById(examId);

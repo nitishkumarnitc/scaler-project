@@ -34,7 +34,7 @@ const studentSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "student",
+      default: "learner",
     },
     currentClassLevels: [
       {
@@ -100,6 +100,6 @@ const studentSchema = new mongoose.Schema(
 );
 
 //model
-const Student = mongoose.model("Student", studentSchema);
+const Learner = mongoose.model("Learner", studentSchema);
 
-module.exports = Student;
+module.exports = Learner;

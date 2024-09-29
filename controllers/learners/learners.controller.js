@@ -1,31 +1,31 @@
 const responseStatus = require("../../handlers/response_status.handler");
 const {
-  adminRegisterStudentService,
+  adminRegisterLearnerService,
   studentLoginService,
-  getStudentsProfileService,
-  getAllStudentsByAdminService,
-  getStudentByAdminService,
+  getLearnersProfileService,
+  getAllLearnersByAdminService,
+  getLearnerByAdminService,
   studentUpdateProfileService,
-  adminUpdateStudentService,
+  adminUpdateLearnerService,
   studentWriteExamService,
-} = require("../../services/students/students.service");
+} = require("../../services/learners/learners.service");
 
 /**
- * @desc Admin Register Student
- * @route POST /api/students/admin/register
+ * @desc Admin Register Learner
+ * @route POST /api/learners/admin/register
  * @access Private Admin only
  **/
-exports.adminRegisterStudentController = async (req, res) => {
+exports.adminRegisterLearnerController = async (req, res) => {
   try {
-    await adminRegisterStudentService(req.body, req.userAuth.id, res);
+    await adminRegisterLearnerService(req.body, req.userAuth.id, res);
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);
   }
 };
 
 /**
- * @desc Login student
- * @route POST /api/v1/students/login
+ * @desc Login learner
+ * @route POST /api/v1/learners/login
  * @access Public
  **/
 exports.studentLoginController = async (req, res) => {
@@ -37,39 +37,39 @@ exports.studentLoginController = async (req, res) => {
 };
 
 /**
- * @desc Student Profile
- * @route GET /api/v1/students/profile
- * @access Private Student only
+ * @desc Learner Profile
+ * @route GET /api/v1/learners/profile
+ * @access Private Learner only
  **/
-exports.getStudentProfileController = async (req, res) => {
+exports.getLearnerProfileController = async (req, res) => {
   try {
-    await getStudentsProfileService(req.userAuth.id, res);
+    await getLearnersProfileService(req.userAuth.id, res);
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);
   }
 };
 
 /**
- * @desc Get all Students
- * @route GET /api/v1/admin/students
+ * @desc Get all Learners
+ * @route GET /api/v1/admin/learners
  * @access Private admin only
  **/
-exports.getAllStudentsByAdminController = async (req, res) => {
+exports.getAllLearnersByAdminController = async (req, res) => {
   try {
-    await getAllStudentsByAdminService(req.userAuth.id, res);
+    await getAllLearnersByAdminService(req.userAuth.id, res);
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);
   }
 };
 
 /**
- * @desc Get Single Student
- * @route GET /api/v1/students/:studentID/admin
+ * @desc Get Single Learner
+ * @route GET /api/v1/learners/:studentID/admin
  * @access Private admin only
  **/
-exports.getStudentByAdminController = async (req, res) => {
+exports.getLearnerByAdminController = async (req, res) => {
   try {
-    const result = await getStudentByAdminService(req.userAuth.id);
+    const result = await getLearnerByAdminService(req.userAuth.id);
     responseStatus(res, 200, "success", result);
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);
@@ -77,9 +77,9 @@ exports.getStudentByAdminController = async (req, res) => {
 };
 
 /**
- * @desc Student updating profile
- * @route UPDATE /api/v1/students/update
- * @access Private Student only
+ * @desc Learner updating profile
+ * @route UPDATE /api/v1/learners/update
+ * @access Private Learner only
  **/
 exports.studentUpdateProfileController = async (req, res) => {
   try {
@@ -90,22 +90,22 @@ exports.studentUpdateProfileController = async (req, res) => {
 };
 
 /**
- * @desc Admin updating Students eg: Assigning classes....
- * @route UPDATE /api/v1/students/:studentID/update/admin
+ * @desc Admin updating Learners eg: Assigning classes....
+ * @route UPDATE /api/v1/learners/:studentID/update/admin
  * @access Private Admin only
  **/
-exports.adminUpdateStudentController = async (req, res) => {
+exports.adminUpdateLearnerController = async (req, res) => {
   try {
-    await adminUpdateStudentService(req.body, req.params.studentId);
+    await adminUpdateLearnerService(req.body, req.params.studentId);
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);
   }
 };
 
 /**
- * @desc Students taking exams
- * @route POST /api/v1/students/:examId/exam-write
- * @access Private Students only
+ * @desc Learners taking exams
+ * @route POST /api/v1/learners/:examId/exam-write
+ * @access Private Learners only
  **/
 exports.studentWriteExamController = async (req, res) => {
   try {

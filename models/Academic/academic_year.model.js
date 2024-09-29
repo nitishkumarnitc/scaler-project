@@ -27,10 +27,10 @@ const academicYearSchema = new mongoose.Schema(
             ref: "Admin",
             required: true,
         },
-        students: [
+        learners: [
             {
                 type: ObjectId,
-                ref: "Student",
+                ref: "Learner",
             },
         ],
         instructors: [
