@@ -6,7 +6,7 @@ const {
   adminPublishResultService,
 } = require("../../services/academic/results.service");
 /**
- * @desc Checking exam results
+ * @description Checking exam results
  * @route Post /api/v1/exam-result/:examId/check
  * @access Private (learners only)
  **/
@@ -22,7 +22,7 @@ exports.studentCheckExamResultController = async (req, res) => {
   }
 };
 /**
- * @desc Get all exam results
+ * @description Get all exam results
  * @route Get /api/v1/exam-results/:classLevelId
  * @access Private (instructors only)
  **/
@@ -39,7 +39,7 @@ exports.getAllExamResultsController = async (req, res) => {
 };
 // TODO:need to work on the publish and unpublish
 /**
- * @desc Admin publishes exam result
+ * @description Admin publishes exam result
  * @route PATCH /api/v1/admin/publish/result/:examId
  * @access Private
  **/
@@ -52,7 +52,7 @@ exports.adminPublishResultsController = async (req, res) => {
 };
 
 /**
- * @desc Admin un-publishes exam result
+ * @description Admin un-publishes exam result
  * @route PUT /api/v1/admin/unpublish/result/:examId
  * @access Private
  **/

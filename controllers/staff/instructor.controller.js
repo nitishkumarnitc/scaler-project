@@ -9,7 +9,7 @@ const {
 } = require("../../services/staff/instructors.service");
 
 /**
- * @desc Admin create instructor
+ * @description Admin create instructor
  * @route POST /api/v1/create-instructor
  * @access Private (admin)
  **/
@@ -22,7 +22,7 @@ exports.createInstructorController = async (req, res) => {
 };
 
 /**
- * @desc Instructor login
+ * @description Instructor login
  * @route POST /api/v1/instructor/login
  * @access Public
  **/
@@ -35,7 +35,7 @@ exports.instructorLoginController = async (req, res) => {
 };
 
 /**
- * @desc Get all instructors
+ * @description Get all instructors
  * @route GET /api/v1/instructors
  * @access Private (admin)
  **/
@@ -49,7 +49,7 @@ exports.getAllInstructorsController = async (req, res) => {
 };
 
 /**
- * @desc Get instructor profile
+ * @description Get instructor profile
  * @route GET /api/v1/instructor/profile
  * @access Private (instructor)
  **/
@@ -63,7 +63,7 @@ exports.getInstructorProfileController = async (req, res) => {
 };
 
 /**
- * @desc Update instructor profile
+ * @description Update instructor profile
  * @route PATCH /api/v1/instructor/update-profile
  * @access Private (Instructor)
  **/
@@ -81,7 +81,7 @@ exports.updateInstructorProfileController = async (req, res) => {
 };
 
 /**
- * @desc Admin update instructor profile
+ * @description Admin update instructor profile
  * @route PATCH /api/v1/instructor/:instructorsId/update-profile
  * @access Private (Admin)
  **/

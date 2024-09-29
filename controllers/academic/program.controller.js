@@ -8,7 +8,7 @@ const {
 } = require("../../services/academic/program.service");
 
 /**
- * @desc Create Program
+ * @description Create Program
  * @route POST /api/v1/programs
  * @access Private
  **/
@@ -21,7 +21,7 @@ exports.createProgramController = async (req, res) => {
 };
 
 /**
- * @desc Get all programs
+ * @description Get all programs
  * @route GET /api/v1/programs
  * @access Private
  **/
@@ -35,7 +35,7 @@ exports.getProgramsController = async (req, res) => {
 };
 
 /**
- * @desc Get single Program
+ * @description Get single Program
  * @route GET /api/v1/programs/:id
  * @access Private
  **/
@@ -49,7 +49,7 @@ exports.getProgramController = async (req, res) => {
 };
 
 /**
- * @desc Update Program
+ * @description Update Program
  * @route Patch /api/v1/programs/:id
  * @access Private
  **/
@@ -62,7 +62,7 @@ exports.updateProgramController = async (req, res) => {
 };
 
 /**
- * @desc Delete Program
+ * @description Delete Program
  * @route Delete /api/v1/programs/:id
  * @access Private
  **/

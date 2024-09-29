@@ -8,7 +8,7 @@ const {
 } = require("../../services/academic/year_group.service");
 
 /**
- * @desc Create YearGroup
+ * @description Create YearGroup
  * @route POST /api/v1/year-group
  * @access Private
  **/
@@ -21,7 +21,7 @@ exports.createYearGroupController = async (req, res) => {
 };
 
 /**
- * @desc Get all YearGroups
+ * @description Get all YearGroups
  * @route GET /api/v1/year-group
  * @access Private
  **/
@@ -35,7 +35,7 @@ exports.getYearGroupsController = async (req, res) => {
 };
 
 /**
- * @desc Get single YearGroup
+ * @description Get single YearGroup
  * @route GET /api/v1/year-group/:id
  * @access Private
  **/
@@ -49,7 +49,7 @@ exports.getYearGroupController = async (req, res) => {
 };
 
 /**
- * @desc Update YearGroup
+ * @description Update YearGroup
  * @route Patch /api/v1/year-group/:id
  * @access Private
  **/
@@ -62,7 +62,7 @@ exports.updateYearGroupController = async (req, res) => {
 };
 
 /**
- * @desc Delete YearGroup
+ * @description Delete YearGroup
  * @route Delete /api/v1/year-group/:id
  * @access Private
  **/

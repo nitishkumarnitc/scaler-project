@@ -8,7 +8,7 @@ const {
 } = require("../../services/academic/subject.service");
 
 /**
- * @desc Create Subject
+ * @description Create Subject
  * @route POST /api/v1/create-subject/:programId
  * @access Private
  **/
@@ -26,7 +26,7 @@ exports.createSubjectController = async (req, res) => {
 };
 
 /**
- * @desc Get all Subjects
+ * @description Get all Subjects
  * @route GET /api/v1/subject
  * @access Private
  **/
@@ -40,7 +40,7 @@ exports.getSubjectsController = async (req, res) => {
 };
 
 /**
- * @desc Get single Subject
+ * @description Get single Subject
  * @route GET /api/v1/subject/:id
  * @access Private
  **/
@@ -54,7 +54,7 @@ exports.getSubjectController = async (req, res) => {
 };
 
 /**
- * @desc Update Subject
+ * @description Update Subject
  * @route Patch /api/v1/subject/:id
  * @access Private
  **/
@@ -67,7 +67,7 @@ exports.updateSubjectController = async (req, res) => {
 };
 
 /**
- * @desc Delete Subject
+ * @description Delete Subject
  * @route Delete /api/v1/subject/:id
  * @access Private
  **/

@@ -8,7 +8,7 @@ const {
 } = require("../../services/academic/academic_year.service");
 
 /**
- * @desc Create Academic Year
+ * @description Create Academic Year
  * @route POST /api/v1/academic-years
  * @access Private
  **/
@@ -21,7 +21,7 @@ exports.createAcademicYearController = async (req, res) => {
 };
 
 /**
- * @desc Get all Academic Years
+ * @description Get all Academic Years
  * @route GET /api/v1/academic-years
  * @access Private
  **/
@@ -35,7 +35,7 @@ exports.getAcademicYearsController = async (req, res) => {
 };
 
 /**
- * @desc Get single Academic Year
+ * @description Get single Academic Year
  * @route GET /api/v1/academic-years/:id
  * @access Private
  **/
@@ -49,7 +49,7 @@ exports.getAcademicYearController = async (req, res) => {
 };
 
 /**
- * @desc Update Academic Year
+ * @description Update Academic Year
  * @route Patch /api/v1/academic-years/:id
  * @access Private
  **/
@@ -62,7 +62,7 @@ exports.updateAcademicYearController = async (req, res) => {
 };
 
 /**
- * @desc Delete Academic Year
+ * @description Delete Academic Year
  * @route Delete /api/v1/academic-years/:id
  * @access Private
  **/

@@ -7,7 +7,7 @@ const {
 } = require("../../services/academic/questions.service");
 
 /**
- * @desc Create Question
+ * @description Create Question
  * @route POST /questions/:examId/create
  * @access Private (Instructors Only)
  **/
@@ -20,7 +20,7 @@ exports.createQuestionsController = async (req, res) => {
 };
 
 /**
- * @desc Get all questions
+ * @description Get all questions
  * @route GET /api/v1/questions
  * @access Private - Instructor only
  **/
@@ -34,7 +34,7 @@ exports.getAllQuestionsController = async (req, res) => {
 };
 
 /**
- * @desc Get question by ID
+ * @description Get question by ID
  * @route GET /api/v1/questions/:id
  * @access Private
  **/
@@ -48,7 +48,7 @@ exports.getQuestionByIdController = async (req, res) => {
 };
 
 /**
- * @desc Update Question
+ * @description Update Question
  * @route PATCH /api/v1/questions/:id
  * @access Private Instructor only
  **/

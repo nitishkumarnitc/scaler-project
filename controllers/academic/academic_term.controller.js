@@ -8,7 +8,7 @@ const {
 } = require("../../services/academic/academic_term.service");
 
 /**
- * @desc Create Academic Term
+ * @description Create Academic Term
  * @route POST /api/v1/academic-Terms
  * @access Private
  **/
@@ -21,7 +21,7 @@ exports.createAcademicTermController = async (req, res) => {
 };
 
 /**
- * @desc Get all Academic Terms
+ * @description Get all Academic Terms
  * @route GET /api/v1/academic-Terms
  * @access Private
  **/
@@ -35,7 +35,7 @@ exports.getAcademicTermsController = async (req, res) => {
 };
 
 /**
- * @desc Get single Academic Term
+ * @description Get single Academic Term
  * @route GET /api/v1/academic-Terms/:id
  * @access Private
  **/
@@ -49,7 +49,7 @@ exports.getAcademicTermController = async (req, res) => {
 };
 
 /**
- * @desc Update Academic Term
+ * @description Update Academic Term
  * @route Patch /api/v1/academic-Terms/:id
  * @access Private
  **/
@@ -67,7 +67,7 @@ exports.updateAcademicTermController = async (req, res) => {
 };
 
 /**
- * @desc Delete Academic Term
+ * @description Delete Academic Term
  * @route Delete /api/v1/academic-Terms/:id
  * @access Private
  **/

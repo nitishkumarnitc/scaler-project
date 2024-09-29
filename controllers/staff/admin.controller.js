@@ -8,7 +8,7 @@ const {
 } = require("../../services/staff/admin.service");
 
 /**
- * @desc Register Admin
+ * @description Register Admin
  * @route POST /api/v1/admin/register
  * @access Private(admin)
  **/
@@ -21,7 +21,7 @@ exports.registerAdminController = async (req, res) => {
 };
 
 /**
- * @desc Login Admin
+ * @description Login Admin
  * @route POST /api/v1/admin/login
  * @access Private
  **/
@@ -34,7 +34,7 @@ exports.loginAdminController = async (req, res) => {
 };
 
 /**
- * @desc Get all admins
+ * @description Get all admins
  * @route GET /api/v1/admins
  * @access Private
  **/
@@ -48,7 +48,7 @@ exports.getAdminsController = async (req, res) => {
 };
 
 /**
- * @desc Get current admin
+ * @description Get current admin
  * @route GET /api/v1/admin/profile
  * @access Private
  **/
@@ -61,7 +61,7 @@ exports.getAdminProfileController = async (req, res) => {
 };
 
 /**
- * @desc Update admin
+ * @description Update admin
  * @route PUT /api/v1/admin/:id
  * @access Private
  **/
@@ -74,7 +74,7 @@ exports.updateAdminController = async (req, res) => {
 };
 
 /**
- * @desc Delete admin
+ * @description Delete admin
  * @route DELETE /api/v1/admins/:id
  * @access Private
  **/
@@ -90,7 +90,7 @@ exports.deleteAdminController = (req, res) => {
 };
 
 /**
- * @desc Admin suspends a instructor
+ * @description Admin suspends a instructor
  * @route PUT /api/v1/admins/suspend/instructor/:id
  * @access Private
  **/
@@ -106,7 +106,7 @@ exports.adminSuspendInstructorController = (req, res) => {
 };
 
 /**
- * @desc Admin unsuspends a instructor
+ * @description Admin unsuspends a instructor
  * @route PUT /api/v1/admins/unsuspend/instructor/:id
  * @access Private
  **/
@@ -122,7 +122,7 @@ exports.adminUnSuspendInstructorController = (req, res) => {
 };
 
 /**
- * @desc Admin withdraws a instructor
+ * @description Admin withdraws a instructor
  * @route PUT /api/v1/admins/withdraw/instructor/:id
  * @access Private
  **/
@@ -138,7 +138,7 @@ exports.adminWithdrawInstructorController = (req, res) => {
 };
 
 /**
- * @desc Admin un-withdraws a instructor
+ * @description Admin un-withdraws a instructor
  * @route PUT /api/v1/admins/unwithdraw/instructor/:id
  * @access Private
  **/
@@ -154,7 +154,7 @@ exports.adminUnWithdrawInstructorController = (req, res) => {
 };
 
 /**
- * @desc Admin publishes exam result
+ * @description Admin publishes exam result
  * @route PUT /api/v1/admins/publish/result/:id
  * @access Private
  **/
@@ -170,7 +170,7 @@ exports.adminPublishResultsController = (req, res) => {
 };
 
 /**
- * @desc Admin un-publishes exam result
+ * @description Admin un-publishes exam result
  * @route PUT /api/v1/admins/unpublish/result/:id
  * @access Private
  **/

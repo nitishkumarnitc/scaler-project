@@ -8,7 +8,7 @@ const {
 } = require("../../services/academic/class.service");
 
 /**
- * @desc Create Class Level
+ * @description Create Class Level
  * @route POST /api/v1/class-levels
  * @access Private
  **/
@@ -21,7 +21,7 @@ exports.createClassLevelController = async (req, res) => {
 };
 
 /**
- * @desc Get all Class Levels
+ * @description Get all Class Levels
  * @route GET /api/v1/class-levels
  * @access Private
  **/
@@ -35,7 +35,7 @@ exports.getClassLevelsController = async (req, res) => {
 };
 
 /**
- * @desc Get single Class Level
+ * @description Get single Class Level
  * @route GET /api/v1/class-levels/:id
  * @access Private
  **/
@@ -49,7 +49,7 @@ exports.getClassLevelController = async (req, res) => {
 };
 
 /**
- * @desc Update Class Level
+ * @description Update Class Level
  * @route Patch /api/v1/class-levels/:id
  * @access Private
  **/
@@ -67,7 +67,7 @@ exports.updateClassLevelController = async (req, res) => {
 };
 
 /**
- * @desc Delete Class Level
+ * @description Delete Class Level
  * @route Delete /api/v1/class-levels/:id
  * @access Private
  **/

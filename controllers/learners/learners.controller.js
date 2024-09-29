@@ -11,7 +11,7 @@ const {
 } = require("../../services/learners/learners.service");
 
 /**
- * @desc Admin Register Learner
+ * @description Admin Register Learner
  * @route POST /api/learners/admin/register
  * @access Private Admin only
  **/
@@ -24,7 +24,7 @@ exports.adminRegisterLearnerController = async (req, res) => {
 };
 
 /**
- * @desc Login learner
+ * @description Login learner
  * @route POST /api/v1/learners/login
  * @access Public
  **/
@@ -37,7 +37,7 @@ exports.studentLoginController = async (req, res) => {
 };
 
 /**
- * @desc Learner Profile
+ * @description Learner Profile
  * @route GET /api/v1/learners/profile
  * @access Private Learner only
  **/
@@ -50,7 +50,7 @@ exports.getLearnerProfileController = async (req, res) => {
 };
 
 /**
- * @desc Get all Learners
+ * @description Get all Learners
  * @route GET /api/v1/admin/learners
  * @access Private admin only
  **/
@@ -63,7 +63,7 @@ exports.getAllLearnersByAdminController = async (req, res) => {
 };
 
 /**
- * @desc Get Single Learner
+ * @description Get Single Learner
  * @route GET /api/v1/learners/:studentID/admin
  * @access Private admin only
  **/
@@ -77,7 +77,7 @@ exports.getLearnerByAdminController = async (req, res) => {
 };
 
 /**
- * @desc Learner updating profile
+ * @description Learner updating profile
  * @route UPDATE /api/v1/learners/update
  * @access Private Learner only
  **/
@@ -90,7 +90,7 @@ exports.studentUpdateProfileController = async (req, res) => {
 };
 
 /**
- * @desc Admin updating Learners eg: Assigning classes....
+ * @description Admin updating Learners eg: Assigning classes....
  * @route UPDATE /api/v1/learners/:studentID/update/admin
  * @access Private Admin only
  **/
@@ -103,7 +103,7 @@ exports.adminUpdateLearnerController = async (req, res) => {
 };
 
 /**
- * @desc Learners taking exams
+ * @description Learners taking exams
  * @route POST /api/v1/learners/:examId/exam-write
  * @access Private Learners only
  **/
