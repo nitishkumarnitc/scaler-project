@@ -2,7 +2,7 @@
 const Teacher = require("../../models/Staff/teachers.model");
 const Exams = require("../../models/Academic/exams.model");
 // Import responseStatus handler
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 
 /**
  * Create exam service by a teacher.

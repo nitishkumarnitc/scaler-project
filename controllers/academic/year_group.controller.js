@@ -1,11 +1,11 @@
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 const {
   getAllYearGroupsService,
   createYearGroupService,
   getYearGroupsService,
   deleteYearGroupService,
   updateYearGroupService,
-} = require("../../services/academic/yearGroup.service");
+} = require("../../services/academic/year_group.service");
 
 /**
  * @desc Create YearGroup

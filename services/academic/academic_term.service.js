@@ -1,8 +1,8 @@
 // Import necessary models
-const AcademicTerm = require("../../models/Academic/academicTerm.model");
+const AcademicTerm = require("../../models/Academic/academic_term.model");
 const Admin = require("../../models/Staff/admin.model");
 // Import responseStatus handler
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 
 /**
  * Create academic terms service.

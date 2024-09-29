@@ -1,11 +1,11 @@
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 const {
   createAcademicYearService,
   getAcademicYearsService,
   getAcademicYearService,
   updateAcademicYearService,
   deleteAcademicYearService,
-} = require("../../services/academic/academicYear.service");
+} = require("../../services/academic/academic_year.service");
 
 /**
  * @desc Create Academic Year

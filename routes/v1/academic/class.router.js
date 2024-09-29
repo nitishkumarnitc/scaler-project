@@ -1,8 +1,8 @@
 const express = require("express");
 const classRouter = express.Router();
 // middleware
-const isAdmin = require("../../../middlewares/isAdmin");
-const isLoggedIn = require("../../../middlewares/isLoggedIn");
+const isAdmin = require("../../../middlewares/is_admin");
+const isLoggedIn = require("../../../middlewares/is_logged_in");
 // controllers
 const {
   getClassLevelsController,

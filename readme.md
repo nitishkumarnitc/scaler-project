@@ -49,7 +49,6 @@ The server will start on the port specified in your `.env` file (default is 5130
 - POST /api/auth/login
 - GET /api/students
 - POST /api/students
-- ... (add more endpoints as needed)
 
 ## Dependencies
 

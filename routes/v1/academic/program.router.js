@@ -1,8 +1,8 @@
 const express = require("express");
 const programRouter = express.Router();
 // middleware
-const isAdmin = require("../../../middlewares/isAdmin");
-const isLoggedIn = require("../../../middlewares/isLoggedIn");
+const isAdmin = require("../../../middlewares/is_admin");
+const isLoggedIn = require("../../../middlewares/is_logged_in");
 const {
   getProgramsController,
   createProgramController,

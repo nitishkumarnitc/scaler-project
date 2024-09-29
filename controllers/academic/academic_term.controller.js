@@ -1,11 +1,11 @@
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 const {
   createAcademicTermService,
   getAcademicTermsService,
   getAcademicTermService,
   updateAcademicTermService,
   deleteAcademicTermService,
-} = require("../../services/academic/academicTerm.service");
+} = require("../../services/academic/academic_term.service");
 
 /**
  * @desc Create Academic Term

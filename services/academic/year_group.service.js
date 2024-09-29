@@ -1,8 +1,8 @@
 // Import necessary models
-const YearGroup = require("../../models/Academic/yearGroup.model");
+const YearGroup = require("../../models/Academic/year_group.model");
 const Admin = require("../../models/Staff/admin.model");
 // Import responseStatus handler
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 
 /**
  * Create YearGroup service.

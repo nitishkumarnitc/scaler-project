@@ -1,8 +1,8 @@
 const express = require("express");
 const examRouter = express.Router();
 // middlewares
-const isLoggedIn = require("../../../middlewares/isLoggedIn");
-const isTeacher = require("../../../middlewares/isTeacher");
+const isLoggedIn = require("../../../middlewares/is_logged_in");
+const isTeacher = require("../../../middlewares/is_teacher");
 // controller
 const {
   createExamController,

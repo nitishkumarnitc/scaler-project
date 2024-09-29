@@ -1,14 +1,14 @@
 const {
   hashPassword,
   isPassMatched,
-} = require("../../handlers/passHash.handler");
+} = require("../../handlers/pass_hash.handler");
 const Admin = require("../../models/Staff/admin.model");
 const Student = require("../../models/Students/students.model");
 const Exam = require("../../models/Academic/exams.model");
 const Results = require("../../models/Academic/results.model");
-const generateToken = require("../../utils/tokenGenerator");
-const responseStatus = require("../../handlers/responseStatus.handler");
-const { resultCalculate } = require("../../functions/resultCalculate.function");
+const generateToken = require("../../utils/token_generator");
+const responseStatus = require("../../handlers/response_status.handler");
+const { resultCalculate } = require("../../functions/result_calculate.function");
 
 /**
  * Admin registration service for creating a new student.

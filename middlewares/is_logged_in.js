@@ -1,6 +1,6 @@
-const verifyToken = require("../utils/verifyToken");
+const verifyToken = require("../utils/verify_token");
 
-const isLoggedIn = (req, res, next) => {
+const is_logged_in = (req, res, next) => {
   // get token from header
   const headerObj = req.headers;
   const token = headerObj.authorization.split(" ")[1];
@@ -17,4 +17,4 @@ const isLoggedIn = (req, res, next) => {
   }
   //save user to user.obj
 };
-module.exports = isLoggedIn;
+module.exports = is_logged_in;

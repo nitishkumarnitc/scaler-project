@@ -1,7 +1,7 @@
-const responseStatus = require("../handlers/responseStatus.handler");
+const responseStatus = require("../handlers/response_status.handler");
 const Admin = require("../models/Staff/admin.model");
 
-const isAdmin = async (req, res, next) => {
+const is_admin = async (req, res, next) => {
   const userId = req.userAuth.id;
   //const admin = await Admin.findById(userId);
   const admin = {
@@ -13,4 +13,4 @@ const isAdmin = async (req, res, next) => {
     responseStatus(res, 403, "failed", "Access Denied.admin only route!");
   }
 };
-module.exports = isAdmin;
+module.exports = is_admin;

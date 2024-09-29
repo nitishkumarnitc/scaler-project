@@ -2,9 +2,9 @@ const express = require("express");
 const studentsRouter = express.Router();
 
 // Middleware
-const isLoggedIn = require("../../../middlewares/isLoggedIn");
-const isAdmin = require("../../../middlewares/isAdmin");
-const isStudent = require("../../../middlewares/isStudent");
+const isLoggedIn = require("../../../middlewares/is_logged_in");
+const isAdmin = require("../../../middlewares/is_admin");
+const isStudent = require("../../../middlewares/is_student");
 
 // Controllers
 const {

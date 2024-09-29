@@ -1,9 +1,9 @@
 const express = require("express");
 const teachersRouter = express.Router();
 //middleware
-const isLoggedIn = require("../../../middlewares/isLoggedIn");
-const isAdmin = require("../../../middlewares/isAdmin");
-const isTeacher = require("../../../middlewares/isTeacher");
+const isLoggedIn = require("../../../middlewares/is_logged_in");
+const isAdmin = require("../../../middlewares/is_admin");
+const isTeacher = require("../../../middlewares/is_teacher");
 //controllers
 const {
   createTeacherController,

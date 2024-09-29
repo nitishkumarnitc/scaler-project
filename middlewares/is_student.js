@@ -1,4 +1,4 @@
-const responseStatus = require("../handlers/responseStatus.handler");
+const responseStatus = require("../handlers/response_status.handler");
 const Teacher = require("../models/Staff/teachers.model");
 
 const isTeacher = async (req, res, next) => {

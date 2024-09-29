@@ -1,6 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
-const routeSync = require("../handlers/routeSync.handler");
+const routeSync = require("../handlers/route_sync.handler");
 const cors = require('cors')
 
 // Initialize the Express application

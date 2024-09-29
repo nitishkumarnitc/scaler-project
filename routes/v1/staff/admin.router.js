@@ -14,8 +14,8 @@ const {
 } = require("../../../controllers/staff/admin.controller");
 const adminRouter = express.Router();
 // middleware
-const isLoggedIn = require("../../../middlewares/isLoggedIn");
-const isAdmin = require("../../../middlewares/isAdmin");
+const isLoggedIn = require("../../../middlewares/is_logged_in");
+const isAdmin = require("../../../middlewares/is_admin");
 
 // register
 adminRouter

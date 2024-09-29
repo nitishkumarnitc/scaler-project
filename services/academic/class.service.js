@@ -2,7 +2,7 @@
 const ClassLevel = require("../../models/Academic/class.model");
 const Admin = require("../../models/Staff/admin.model");
 // Import responseStatus handler
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 /**
  * Create class service.
  *

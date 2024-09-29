@@ -3,7 +3,7 @@ const Subject = require("../../models/Academic/subject.model");
 // const ClassLevel = require("../../models/Academic/class.model");
 const Program = require("../../models/Academic/program.model");
 // Import responseStatus handler
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 
 /**
  * Create Subject service.

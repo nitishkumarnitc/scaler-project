@@ -3,7 +3,7 @@ require("dotenv").config();
 require("colors");
 const uri = process.env.DB;
 
-const dbConnect = async () => {
+const db_connect = async () => {
   await mongoose
     .connect(uri)
     .then(() => {
@@ -13,4 +13,4 @@ const dbConnect = async () => {
       console.error(`Failed to connect database: ${err}`.red.bold);
     });
 };
-dbConnect();
+db_connect();

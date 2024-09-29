@@ -1,7 +1,7 @@
 // Import necessary models
-const AcademicYear = require("../../models/Academic/academicYear.model");
+const AcademicYear = require("../../models/Academic/academic_year.model");
 // Import responseStatus handler
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 
 /**
  * Create academic years service.

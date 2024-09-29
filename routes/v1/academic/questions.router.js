@@ -1,8 +1,8 @@
 const express = require("express");
 const questionsRouter = express.Router();
 //middleware
-const isLoggedIn = require("../../../middlewares/isLoggedIn");
-const isTeacher = require("../../../middlewares/isTeacher");
+const isLoggedIn = require("../../../middlewares/is_logged_in");
+const isTeacher = require("../../../middlewares/is_teacher");
 const {
   createQuestionsController,
   getAllQuestionsController,

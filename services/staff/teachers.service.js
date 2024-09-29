@@ -1,12 +1,12 @@
 const {
   hashPassword,
   isPassMatched,
-} = require("../../handlers/passHash.handler");
+} = require("../../handlers/pass_hash.handler");
 const Teacher = require("../../models/Staff/teachers.model");
 const Admin = require("../../models/Staff/admin.model");
-const generateToken = require("../../utils/tokenGenerator");
+const generateToken = require("../../utils/token_generator");
 // Import responseStatus handler
-const responseStatus = require("../../handlers/responseStatus.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 
 /**
  * Service to create a new teacher

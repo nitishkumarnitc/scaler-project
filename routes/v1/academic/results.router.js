@@ -1,9 +1,9 @@
 const express = require("express");
 const resultsRouter = express.Router();
 // middleware
-const isLoggedIn = require("../../../middlewares/isLoggedIn");
-const isStudent = require("../../../middlewares/isStudent");
-const isTeacher = require("../../../middlewares/isTeacher");
+const isLoggedIn = require("../../../middlewares/is_logged_in");
+const isStudent = require("../../../middlewares/is_student");
+const isTeacher = require("../../../middlewares/is_teacher");
 // controllers
 const {
   studentCheckExamResultController,

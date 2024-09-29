@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const verifyToken = (token) => {
+const verify_token = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
     if (err) {
       return false;
@@ -9,4 +9,4 @@ const verifyToken = (token) => {
     }
   });
 };
-module.exports = verifyToken;
+module.exports = verify_token;

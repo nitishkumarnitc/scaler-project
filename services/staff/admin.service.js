@@ -2,10 +2,10 @@
 const {
   hashPassword,
   isPassMatched,
-} = require("../../handlers/passHash.handler");
-const responseStatus = require("../../handlers/responseStatus.handler");
+} = require("../../handlers/pass_hash.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 const Admin = require("../../models/Staff/admin.model");
-const generateToken = require("../../utils/tokenGenerator");
+const generateToken = require("../../utils/token_generator");
 
 /**
  * Register admin service.
