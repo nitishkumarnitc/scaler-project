@@ -45,6 +45,8 @@ The server will start on the port specified in your `.env` file (default is 5130
 ## API Endpoints
 
 (List your API endpoints here, e.g.:)
+
+- http://localhost:5130
 - POST /api/auth/register
 - POST /api/auth/login
 - GET /api/learners
