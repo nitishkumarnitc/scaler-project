@@ -8,12 +8,12 @@ const redisClient = require("../../config/redis_connect"); // Import Redis clien
 /**
  * Create academic terms service.
  *
- * @param {Object} data - The data containing information about the academic term.
- * @param {string} data.name - The name of the academic term.
- * @param {string} data.description - The description of the academic term.
- * @param {string} data.duration - The duration of the academic term.
- * @param {string} userId - The ID of the user creating the academic term.
- * @returns {Object} - The response object indicating success or failure.
+ * @param {Object} data - The details for the academic term.
+ * @param {string} data.name - Academic term name.
+ * @param {string} data.description - Academic term description.
+ * @param {string} data.duration - Length of the academic term.
+ * @param {string} userId - ID of the user who is creating the term.
+ * @returns {Object} - Object representing the outcome of the operation.
  */
 exports.createAcademicTermService = async (data, userId) => {
   const { name, description, duration } = data;
@@ -82,13 +82,13 @@ exports.getAcademicTermService = async (id) => {
 /**
  * Update academic term service.
  *
- * @param {Object} data - The data containing updated information about the academic term.
- * @param {string} data.name - The updated name of the academic term.
- * @param {string} data.description - The updated description of the academic term.
- * @param {string} data.duration - The updated duration of the academic term.
- * @param {string} academicId - The ID of the academic term to be updated.
- * @param {string} userId - The ID of the user updating the academic term.
- * @returns {Object} - The response object indicating success or failure.
+ * @param {Object} data - The information containing the changes for the academic term.
+ * @param {string} data.name - The new name of the academic term.
+ * @param {string} data.description - The new description of the academic term.
+ * @param {string} data.duration - The new duration of the academic term.
+ * @param {string} academicId - The ID of the academic term that needs to be modified.
+ * @param {string} userId - The ID of the user making the updates.
+ * @returns {Object} - Object representing the success or failure of the update operation.
  */
 exports.updateAcademicTermService = async (data, academicId, userId) => {
   const { name, description, duration } = data;

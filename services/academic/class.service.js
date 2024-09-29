@@ -55,10 +55,10 @@ exports.getClassLevelsService = async (id) => {
 /**
  * Update class data service.
  *
- * @param {Object} data - The data containing updated information about the class.
- * @param {string} id - The ID of the class to be updated.
- * @param {string} userId - The ID of the user updating the class.
- * @returns {Object} - The response object indicating success or failure.
+ * @param {Object} data - Contains the new data for the class.
+ * @param {string} id - The ID of the class that needs updating.
+ * @param {string} userId - The ID of the user performing the update.
+ * @returns {Object} - Result object indicating whether the update was successful or not.
  */
 exports.updateClassLevelService = async (data, id, userId) => {
   try {
