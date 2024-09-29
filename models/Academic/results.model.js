@@ -1,12 +1,6 @@
 const mongoose = require("mongoose");
-const redis = require("redis");
-const util = require("util");
-const {get} = require("../../config/redis_connect");
-
+const redisClient = require("../../config/redis_connect"); // Import the Redis client
 const { ObjectId } = mongoose.Schema;
-
-// Setup Redis client
-const redisClient = get;
 
 const CACHE_EXPIRATION = 3600; // Cache expiration time in seconds (1 hour)
 
@@ -105,7 +99,7 @@ examResultSchema.statics.findWithCache = async function (query) {
     const result = await this.find(query);
 
     // Store the result in Redis for future queries
-    redisClient.setex(cacheKey, CACHE_EXPIRATION, JSON.stringify(result));
+    await redisClient.setEx(cacheKey, CACHE_EXPIRATION, JSON.stringify(result)); // Changed to await
 
     return result;
 };
@@ -113,7 +107,7 @@ examResultSchema.statics.findWithCache = async function (query) {
 // Method to clear cache when data is updated
 examResultSchema.statics.clearCache = async function (query) {
     const cacheKey = JSON.stringify(query);
-    redisClient.del(cacheKey); // Clear cache for the specific query
+    await redisClient.del(cacheKey); // Clear cache for the specific query
 };
 
 const ExamResult = mongoose.model("ExamResult", examResultSchema);

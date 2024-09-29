@@ -3,6 +3,7 @@ const AcademicTerm = require("../../models/Academic/academic_term.model");
 const Admin = require("../../models/Staff/admin.model");
 // Import responseStatus handler
 const responseStatus = require("../../handlers/response_status.handler");
+const redisClient = require("../../config/redis_connect"); // Import Redis client
 
 /**
  * Create academic terms service.
@@ -36,6 +37,9 @@ exports.createAcademicTermService = async (data, userId) => {
   admin.academicTerms.push(academicTermCreated._id);
   await admin.save();
 
+  // Clear the cache (optional: you may choose to only clear specific cache)
+  await redisClient.del("academic_terms_cache");
+
   // Send the response
   return responseStatus(res, 200, "success", academicTermCreated);
 };
@@ -46,7 +50,23 @@ exports.createAcademicTermService = async (data, userId) => {
  * @returns {Array} - An array of all academic terms.
  */
 exports.getAcademicTermsService = async () => {
-  return await AcademicTerm.find();
+  const cacheKey = "academic_terms_cache"; // Unique key for Redis
+
+  // Try to fetch the result from Redis cache
+  const cachedResult = await redisClient.get(cacheKey);
+
+  if (cachedResult) {
+    console.log('Serving from cache');
+    return JSON.parse(cachedResult); // Parse the cached data
+  }
+
+  // If not in cache, query the database
+  const academicTerms = await AcademicTerm.find();
+
+  // Store the result in Redis for future queries
+  await redisClient.setEx(cacheKey, 3600, JSON.stringify(academicTerms)); // Cache for 1 hour
+
+  return academicTerms;
 };
 
 /**
@@ -81,10 +101,13 @@ exports.updateAcademicTermService = async (data, academicId, userId) => {
 
   // Update the academic term
   const academicTerm = await AcademicTerm.findByIdAndUpdate(
-    academicId,
-    { name, description, duration, createdBy: userId },
-    { new: true }
+      academicId,
+      { name, description, duration, createdBy: userId },
+      { new: true }
   );
+
+  // Clear the cache (optional)
+  await redisClient.del("academic_terms_cache");
 
   // Send the response
   return responseStatus(res, 201, "success", academicTerm);
@@ -97,5 +120,7 @@ exports.updateAcademicTermService = async (data, academicId, userId) => {
  * @returns {Object} - The deleted academic term object.
  */
 exports.deleteAcademicTermService = async (id) => {
+  // Clear the cache before deletion
+  await redisClient.del("academic_terms_cache");
   return await AcademicTerm.findByIdAndDelete(id);
 };

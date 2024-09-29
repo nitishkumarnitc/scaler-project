@@ -1,41 +1,32 @@
-const redis = require("redis");
-const util = require("util");
+const { createClient } = require('redis');
+require("dotenv").config();
+require("colors");
 
-let redisClient;
+const client = createClient({
+    url: `redis://${process.env.REDIS_HOST || '127.0.0.1'}:${process.env.REDIS_PORT || 6379}` // Default to localhost if not set
+});
 
-// Handle connection events
-async function redis_connect() {
-    console.log("Connecting to Redis...");
+// Handle connection errors
+client.on('error', (err) => {
+    console.error('Redis Client Error:', err.red.bold);
+});
 
+// Function to connect to Redis
+const redis_connect = async () => {
     try {
-        // Create a Redis client
-        redisClient = redis.createClient({
-            host: process.env.REDIS_HOST || '127.0.0.1', // Default to localhost if not set
-            port: process.env.REDIS_PORT || 6379          // Default to Redis port if not set
-        });
-
-        // Promisify the get method for async/await usage
-        redisClient.get = util.promisify(redisClient.get).bind(redisClient);
-
-        // Await the connection with a promise
-        await new Promise((resolve, reject) => {
-            redisClient.on('connect', () => {
-                console.log('Connected to Redis');
-                resolve(redisClient); // Resolve the promise with the Redis client
-            });
-
-            redisClient.on('error', (err) => {
-                console.error('Redis error:', err);
-                reject(err); // Reject the promise on error
-            });
-        });
-        redisClient.get = util.promisify(redisClient.get).bind(redisClient);
+        await client.connect();
+        console.log("Connected to Redis! ".green.bold);
     } catch (error) {
-        console.error('Failed to create Redis client:', error);
-        throw error; // Re-throw the error for further handling
+        console.error(`Failed to connect to Redis: ${error}`.red.bold);
+        process.exit(1); // Exit the process on connection error
     }
-}
+};
 
+// Export the Redis client and connect function
+module.exports = {
+    client,
+    redis_connect
+};
+
+// Call the connect function immediately
 redis_connect();
-
-module.exports = redisClient;

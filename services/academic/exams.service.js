@@ -1,6 +1,6 @@
 // Import necessary models
 const Teacher = require("../../models/Staff/teachers.model");
-const Exams = require("../../models/Academic/exams.model");
+const { Exam, getAllExams } = require("../../models/Academic/exams.model"); // Use the Exam model and getAllExams
 // Import responseStatus handler
 const responseStatus = require("../../handlers/response_status.handler");
 
@@ -41,12 +41,12 @@ exports.createExamService = async (data, teacherId) => {
     return responseStatus(res, 401, "failed", "Teacher not found!");
 
   // Check if the exam already exists
-  const examExist = await Exams.findOne({ name });
+  const examExist = await Exam.findOne({ name });
   if (examExist)
     return responseStatus(res, 402, "failed", "Exam already exists");
 
   // Create the exam
-  const examCreate = await Exams.create({
+  const examCreate = await Exam.create({
     name,
     description,
     subject,
@@ -64,6 +64,9 @@ exports.createExamService = async (data, teacherId) => {
   teacherExist.examsCreated.push(examCreate._id);
   await teacherExist.save();
 
+  // Clear the cache after creating a new exam
+  await redisClient.del("exams_cache");
+
   // Send the response
   return responseStatus(res, 200, "success", examCreate);
 };
@@ -74,7 +77,7 @@ exports.createExamService = async (data, teacherId) => {
  * @returns {Array} - An array of all exams.
  */
 exports.getAllExamService = async () => {
-  return await Exams.find();
+  return await getAllExams(); // Use the cached method
 };
 
 /**
@@ -84,7 +87,7 @@ exports.getAllExamService = async () => {
  * @returns {Object} - The exam object.
  */
 exports.getExamByIdService = async (id) => {
-  return await Exams.findById(id);
+  return await Exam.findById(id);
 };
 
 /**
@@ -123,32 +126,35 @@ exports.updateExamService = async (data, examId) => {
   } = data;
 
   // Check if the updated name already exists
-  const examFound = await Exams.findOne({ name });
+  const examFound = await Exam.findOne({ name });
   if (examFound) {
     return responseStatus(res, 402, "failed", "Exam already exists");
   }
 
   // Update the exam
-  const examUpdated = await Exams.findByIdAndUpdate(
-    examId,
-    {
-      name,
-      description,
-      subject,
-      program,
-      academicTerm,
-      duration,
-      examDate,
-      examTime,
-      examType,
-      createdBy,
-      academicYear,
-      classLevel,
-    },
-    {
-      new: true,
-    }
+  const examUpdated = await Exam.findByIdAndUpdate(
+      examId,
+      {
+        name,
+        description,
+        subject,
+        program,
+        academicTerm,
+        duration,
+        examDate,
+        examTime,
+        examType,
+        createdBy,
+        academicYear,
+        classLevel,
+      },
+      {
+        new: true,
+      }
   );
+
+  // Clear the cache after updating the exam
+  await redisClient.del("exams_cache");
 
   // Send the response
   return responseStatus(res, 200, "success", examUpdated);
