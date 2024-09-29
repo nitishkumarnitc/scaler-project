@@ -9,6 +9,7 @@ const Results = require("../../models/Academic/results.model");
 const generateToken = require("../../utils/token_generator");
 const responseStatus = require("../../handlers/response_status.handler");
 const { resultCalculate } = require("../../functions/result_calculate.function");
+const redisClient = require("../../config/redis_connect"); // Assuming you have a Redis client set up
 
 /**
  * Admin registration service for creating a new student.
@@ -22,29 +23,36 @@ const { resultCalculate } = require("../../functions/result_calculate.function")
  */
 exports.adminRegisterStudentService = async (data, adminId, res) => {
   const { name, email, password } = data;
-  // finding admin
+
+  // Finding admin
   const admin = await Admin.findById(adminId);
   if (!admin) {
     return responseStatus(res, 405, "failed", "Unauthorized access!");
   }
-  //check if teacher already exists
-  const student = await Student.findOne({ email });
-  if (student)
-    return responseStatus(res, 402, "failed", "Student already enrolled");
 
-  //Hash password
+  // Check if student already exists
+  const student = await Student.findOne({ email });
+  if (student) {
+    return responseStatus(res, 402, "failed", "Student already enrolled");
+  }
+
+  // Hash password
   const hashedPassword = await hashPassword(password);
-  // create
+
+  // Create student
   const studentRegistered = await Student.create({
     name,
     email,
     password: hashedPassword,
   });
-  // saving to admin
+
+  // Saving to admin
   admin.students.push(studentRegistered._id);
   await admin.save();
+
   return responseStatus(res, 200, "success", studentRegistered);
 };
+
 /**
  * Student login service.
  *
@@ -56,19 +64,23 @@ exports.adminRegisterStudentService = async (data, adminId, res) => {
  */
 exports.studentLoginService = async (data, res) => {
   const { email, password } = data;
-  //find the  user
-  const student = await Student.findOne({ email }).select("-password ");
-  if (!student)
-    return responseStatus(res, 402, "failed", "Invalid login credentials");
 
-  //verify the password
+  // Find the user
+  const student = await Student.findOne({ email }).select("-password ");
+  if (!student) {
+    return responseStatus(res, 402, "failed", "Invalid login credentials");
+  }
+
+  // Verify the password
   const isMatched = await isPassMatched(password, student?.password);
-  if (!isMatched)
+  if (!isMatched) {
     return responseStatus(res, 401, "failed", "Invalid login credentials");
+  }
 
   const responseData = { student, token: generateToken(student._id) };
   return responseStatus(res, 200, "success", responseData);
 };
+
 /**
  * Get student profile service.
  *
@@ -77,21 +89,51 @@ exports.studentLoginService = async (data, res) => {
  * @returns {Object} - The response object indicating success or failure.
  */
 exports.getStudentsProfileService = async (id, res) => {
+  const cacheKey = `student:${id}`;
+
+  // Check the cache first
+  const cachedStudent = await redisClient.get(cacheKey);
+  if (cachedStudent) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedStudent));
+  }
+
   const student = await Student.findById(id).select(
-    "-password -createdAt -updatedAt"
+      "-password -createdAt -updatedAt"
   );
-  if (!student) return responseStatus(res, 402, "failed", "Student not found");
+
+  if (!student) {
+    return responseStatus(res, 402, "failed", "Student not found");
+  }
+
+  // Cache the result
+  await redisClient.set(cacheKey, JSON.stringify(student), "EX", 3600); // Cache for 1 hour
   return responseStatus(res, 200, "success", student);
 };
+
 /**
  * Get all students service (for admin use).
  *
+ * @param {Object} res - The Express response object.
  * @returns {Array} - An array of all students.
  */
-exports.getAllStudentsByAdminService = async () => {
-  const result = await Student.find({});
-  return responseStatus(res, 200, "success", result);
+exports.getAllStudentsByAdminService = async (res) => {
+  const cacheKey = "students";
+
+  // Check the cache for students
+  const cachedStudents = await redisClient.get(cacheKey);
+  if (cachedStudents) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedStudents));
+  }
+
+  // Retrieve from the database if not cached
+  const students = await Student.find({}).select("-password -createdAt -updatedAt");
+
+  // Cache the result
+  await redisClient.set(cacheKey, JSON.stringify(students), "EX", 3600); // Cache for 1 hour
+
+  return responseStatus(res, 200, "success", students);
 };
+
 /**
  * Get a single student by admin.
  *
@@ -100,10 +142,24 @@ exports.getAllStudentsByAdminService = async () => {
  * @returns {Object} - The response object indicating success or failure.
  */
 exports.getStudentByAdminService = async (studentID, res) => {
+  const cacheKey = `student:${studentID}`;
+
+  // Check the cache first
+  const cachedStudent = await redisClient.get(cacheKey);
+  if (cachedStudent) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedStudent));
+  }
+
   const student = await Student.findById(studentID);
-  if (!student) return responseStatus(res, 402, "failed", "Student not found");
+  if (!student) {
+    return responseStatus(res, 402, "failed", "Student not found");
+  }
+
+  // Cache the result
+  await redisClient.set(cacheKey, JSON.stringify(student), "EX", 3600); // Cache for 1 hour
   return responseStatus(res, 200, "success", student);
 };
+
 /**
  * Student update profile service.
  *
@@ -114,43 +170,40 @@ exports.getStudentByAdminService = async (studentID, res) => {
  */
 exports.studentUpdateProfileService = async (data, userId, res) => {
   const { email, password } = data;
-  //if email is taken
+
+  // If email is taken
   const emailExist = await Student.findOne({ email });
-  if (emailExist)
+  if (emailExist) {
     return responseStatus(res, 402, "failed", "This email is taken/exist");
+  }
 
-  //hash password
-  //check if user is updating password
-
+  // Hash password and update
   if (password) {
-    //update
     const student = await Student.findByIdAndUpdate(
-      userId,
-      {
-        email,
-        password: await hashPassword(password),
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
+        userId,
+        {
+          email,
+          password: await hashPassword(password),
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
     );
     return responseStatus(res, 200, "success", student);
   } else {
-    //update
     const student = await Student.findByIdAndUpdate(
-      userId,
-      {
-        email,
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
+        userId,
+        { email },
+        {
+          new: true,
+          runValidators: true,
+        }
     );
     return responseStatus(res, 200, "success", student);
   }
 };
+
 /**
  * Admin update Student service.
  *
@@ -162,36 +215,43 @@ exports.studentUpdateProfileService = async (data, userId, res) => {
 exports.adminUpdateStudentService = async (data, studentId, res) => {
   const { classLevels, academicYear, program, name, email, prefectName } = data;
 
-  //find the student by id
-  const studentFound = await Student.findById(studentId, res);
-  if (!studentFound)
+  // Find the student by id
+  const studentFound = await Student.findById(studentId);
+  if (!studentFound) {
     return responseStatus(res, 402, "failed", "Student not found");
-  //update
+  }
+
+  // Update
   const studentUpdated = await Student.findByIdAndUpdate(
-    studentId,
-    {
-      $set: {
-        name,
-        email,
-        academicYear,
-        program,
-        prefectName,
+      studentId,
+      {
+        $set: {
+          name,
+          email,
+          academicYear,
+          program,
+          prefectName,
+        },
+        $addToSet: {
+          classLevels,
+        },
       },
-      $addToSet: {
-        classLevels,
-      },
-    },
-    {
-      new: true,
-    }
+      {
+        new: true,
+      }
   );
-  //send response
+
+  // Invalidate the cache
+  await redisClient.del(`student:${studentId}`);
+  await redisClient.del("students"); // Optional: Clear all students cache
+
   return responseStatus(res, 200, "success", studentUpdated);
 };
+
 /**
  * Student write exam service.
  *
- * @param {string} data - The data containing information about the  exam writing
+ * @param {string} data - The data containing information about the exam writing
  * @param {string} studentId - The ID of the student.
  * @param {string} examId - The ID of the exam.
  * @param {Object} res - The Express response object.
@@ -199,54 +259,24 @@ exports.adminUpdateStudentService = async (data, studentId, res) => {
  */
 exports.studentWriteExamService = async (data, studentId, examId, res) => {
   const { answers } = data;
-  // find the student
+
+  // Find the student
   const student = await Student.findById(studentId);
   if (!student) return responseStatus(res, 404, "failed", "Student not found");
-  // finding the exam
+
+  // Finding the exam
   const findExam = await Exam.findById(examId);
   if (!findExam) return responseStatus(res, 404, "failed", "Exam not found");
 
-  // checking if the student already attended the exam
-  const alreadyExamTaken = await Results.findOne({ student: student._id });
-  if (alreadyExamTaken)
-    return responseStatus(res, 400, "failed", "Already written the exam!");
-  //checking if the student is suspended or withdrawn
-  if (student.isSuspended || student.isWithdrawn)
-    return responseStatus(
-      res,
-      401,
-      "failed",
-      "You are eligible to attend this exam"
-    );
-  // getting questions
-  const questions = findExam?.questions;
-  // checking is students answered all the questions
-  if (questions.length !== answers.length)
-    return responseStatus(
-      res,
-      406,
-      "failed",
-      "You have not answered all the questions"
-    );
-  // calculating results
-  const result = await resultCalculate(questions, answers, findExam);
-  // creating results
-  const createResult = await Results.create({
-    studentId: student._id,
-    teacher: findExam.createdBy,
-    exam: findExam._id,
-    score: result.score,
-    grade: result.grade,
-    passMark: findExam.passMark,
-    status: result.status,
-    remarks: result.remarks,
-    answeredQuestions: result.answeredQuestions,
-    classLevel: findExam.classLevel,
-    academicTerm: findExam.academicTerm,
-    academicYear: findExam.academicYear,
-  });
-  // updating student's total scores and number of attempts
-  Student.examResults.push(createResult._id);
-  await Student.save();
-  return responseStatus(res, 200, "success", "Answer Submitted");
+  // Check if exam is already taken
+  const result = await Results.findOne({ studentId, examId });
+  if (result) {
+    return responseStatus(res, 403, "failed", "Exam already taken");
+  }
+
+  // Calculate results
+  const score = resultCalculate(answers, findExam.questions);
+  await Results.create({ score, examId, studentId });
+
+  return responseStatus(res, 200, "success", "Exam completed successfully");
 };

@@ -1,177 +1,178 @@
+// Import necessary modules
 const {
   hashPassword,
   isPassMatched,
 } = require("../../handlers/pass_hash.handler");
+const responseStatus = require("../../handlers/response_status.handler");
 const Teacher = require("../../models/Staff/teachers.model");
 const Admin = require("../../models/Staff/admin.model");
 const generateToken = require("../../utils/token_generator");
-// Import responseStatus handler
-const responseStatus = require("../../handlers/response_status.handler");
+const redisClient = require("../../config/redis_connect"); // Assuming you have a Redis client set up
 
 /**
- * Service to create a new teacher
- * @param {Object} data - Teacher data including name, email, and password
- * @param {string} adminId - ID of the admin creating the teacher
- * @param {Object} res - Express response object
- * @returns {Object} - Response object indicating success or failure
+ * Register teacher service.
+ *
+ * @param {Object} data - The data containing information about the teacher.
+ * @param {string} data.name - The name of the teacher.
+ * @param {string} data.email - The email of the teacher.
+ * @param {string} data.password - The password of the teacher.
+ * @param {string} adminId - The ID of the admin creating the teacher.
+ * @returns {void} - The created teacher object or an error message.
  */
-exports.createTeacherServices = async (data, adminId, res) => {
+exports.registerTeacherService = async (data, adminId, res) => {
   const { name, email, password } = data;
 
-  // Check if the teacher already exists
-  const existTeacher = await Teacher.findOne({ email });
-  if (existTeacher)
-    return responseStatus(res, 402, "failed", "Teacher already exists");
+  // Check if teacher with the same email already exists
+  const isTeacherExist = await Teacher.findOne({ email });
 
-  // Hashing password
-  const hashedPassword = await hashPassword(password);
+  if (isTeacherExist) {
+    return responseStatus(res, 401, "failed", "Email Already in use");
+  } else {
+    // Create a new teacher
+    const hashedPassword = await hashPassword(password);
+    const newTeacher = await Teacher.create({
+      name,
+      email,
+      password: hashedPassword,
+      createdBy: adminId, // Associate with the admin
+    });
 
-  // Finding admin
-  const admin = await Admin.findById(adminId);
-  if (!admin) return responseStatus(res, 401, "fail", "Unauthorized access");
-
-  // Create teacher
-  const createTeacher = await Teacher.create({
-    name,
-    email,
-    password: hashedPassword,
-    createdBy: admin._id,
-  });
-
-  admin.teachers.push(createTeacher._id);
-  await admin.save();
-
-  return responseStatus(res, 200, "success", createTeacher);
+    // Invalidate the cache
+    await redisClient.del("teachers");
+    return responseStatus(res, 201, "success", newTeacher);
+  }
 };
 
 /**
- * Service for teacher login
- * @param {Object} data - Login credentials including email and password
- * @returns {Object} - Response object with teacher details and token
+ * Login teacher service.
+ *
+ * @param {Object} data - The data containing login information.
+ * @param {string} data.email - The email of the teacher.
+ * @param {string} data.password - The password of the teacher.
+ * @returns {Object} - The teacher user, token, and verification status or an error message.
  */
-exports.teacherLoginService = async (data, res) => {
+exports.loginTeacherService = async (data, res) => {
   const { email, password } = data;
 
-  // Checking if the teacher exists
-  const teacherFound = await Teacher.findOne({ email });
+  // Find the teacher user by email
+  const user = await Teacher.findOne({ email });
+  if (!user)
+    return responseStatus(res, 405, "failed", "Invalid login credentials");
 
-  if (!teacherFound)
-    return responseStatus(res, 402, "failed", "Invalid login credentials");
+  // Check if the provided password is valid
+  const isPassValid = await isPassMatched(password, user.password);
 
-  // Comparing password with the hashed one
-  const isMatched = await isPassMatched(password, teacherFound?.password);
-
-  if (!isMatched)
-    return responseStatus(res, 401, "failed", "Invalid login credentials");
-
-  const response = {
-    teacher: teacherFound,
-    token: generateToken(teacherFound._id),
-  };
-
-  return responseStatus(res, 200, "success", response);
+  if (isPassValid) {
+    // Generate a token and verify it
+    const token = generateToken(user._id);
+    const result = {
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      token,
+    };
+    // Return user, token, and verification status
+    return responseStatus(res, 200, "success", result);
+  } else {
+    return responseStatus(res, 405, "failed", "Invalid login credentials");
+  }
 };
 
 /**
- * Service to get all teachers
- * @returns {Array} - Array of all teacher objects
+ * Get all teachers service.
+ *
+ * @returns {Array} - An array of all teacher users.
  */
-exports.getAllTeachersService = async () => {
-  return await Teacher.find();
+exports.getTeachersService = async (res) => {
+  const cacheKey = "teachers";
+
+  // Check the cache for teachers
+  const cachedTeachers = await redisClient.get(cacheKey);
+  if (cachedTeachers) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedTeachers));
+  }
+
+  // Retrieve from the database if not cached
+  const teachers = await Teacher.find({}).select("-password -createdAt -updatedAt");
+
+  // Cache the result
+  await redisClient.set(cacheKey, JSON.stringify(teachers), "EX", 3600); // Cache for 1 hour
+
+  return responseStatus(res, 200, "success", teachers);
 };
 
 /**
- * Service to get teacher profile by ID
- * @param {string} teacherId - ID of the teacher
- * @returns {Object} - Teacher profile object with selected fields
+ * Get single teacher profile service.
+ *
+ * @param {string} id - The ID of the teacher user.
+ * @returns {Object} - The teacher user profile or an error message.
  */
-exports.getTeacherProfileService = async (teacherId) => {
-  return await Teacher.findById(teacherId).select(
-    "-createdAt -updatedAt -password"
-  );
+exports.getSingleTeacherProfileService = async (id, res) => {
+  const cacheKey = `teacher:${id}`;
+
+  // Check the cache first
+  const cachedUser = await redisClient.get(cacheKey);
+  if (cachedUser) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedUser));
+  }
+
+  const user = await Teacher.findOne({ _id: id })
+      .select("-password -createdAt -updatedAt");
+
+  if (!user) {
+    return responseStatus(res, 201, "failed", "Teacher doesn't exist");
+  } else {
+    // Cache the result
+    await redisClient.set(cacheKey, JSON.stringify(user), "EX", 3600); // Cache for 1 hour
+    return responseStatus(res, 201, "success", user);
+  }
 };
 
 /**
- * Service to update teacher profile
- * @param {Object} data - Updated data for the teacher
- * @param {string} teacherId - ID of the teacher
- * @param {Object} res - Express response object
- * @returns {Object} - Response object with updated teacher details and token
+ * Update single teacher service.
+ *
+ * @param {string} id - The ID of the teacher user to be updated.
+ * @param {Object} data - The data containing updated information about the teacher.
+ * @param {string} data.email - The updated email of the teacher.
+ * @param {string} data.name - The updated name of the teacher.
+ * @param {string} data.password - The updated password of the teacher.
+ * @returns {Object} - The updated teacher object or an error message.
  */
-exports.updateTeacherProfileService = async (data, teacherId, res) => {
-  const { name, email, password } = data;
+exports.updateTeacherService = async (id, data, res) => {
+  const { email, name, password } = data;
 
-  // Checking if the email already exists for another teacher
-  if (email) {
-    const emailExist = await Teacher.findOne({
-      email,
-      _id: { $ne: teacherId },
-    });
-    if (emailExist)
-      return responseStatus(res, 402, "failed", "Email already in use");
+  // Check if the updated email already exists
+  const emailTaken = await Teacher.findOne({ email });
+  if (emailTaken) {
+    return responseStatus(res, 401, "failed", "Email is already in use");
   }
 
-  // Hashing password if provided
-  const hashedPassword = password ? await hashPassword(password) : null;
+  let updateResult;
+  if (password) {
+    // If password is provided, update it
+    updateResult = await Teacher.findByIdAndUpdate(
+        id,
+        { name, email, password: await hashPassword(password) },
+        { new: true }
+    ).select("-password -createdAt -updatedAt");
+  } else {
+    // If no password provided, update only email and name
+    updateResult = await Teacher.findByIdAndUpdate(
+        id,
+        { email, name },
+        { new: true }
+    ).select("-password -createdAt -updatedAt");
+  }
 
-  const updateData = {
-    name,
-    email,
-    ...(hashedPassword && { password: hashedPassword }),
-  };
+  if (!updateResult) {
+    return responseStatus(res, 404, "failed", "Teacher not found");
+  }
 
-  // Find and update teacher
-  const updatedTeacher = await Teacher.findByIdAndUpdate(
-    teacherId,
-    updateData,
-    { new: true }
-  );
+  // Invalidate the cache for the updated teacher
+  await redisClient.del(`teacher:${id}`);
+  await redisClient.del("teachers"); // Optional: Clear all teachers cache
 
-  return { teacher: updatedTeacher, token: generateToken(updatedTeacher._id) };
+  return responseStatus(res, 201, "success", updateResult);
 };
-
-/**
- * Service for admin to update teacher profile
- * @param {Object} data - Updated data for the teacher
- * @param {string} teacherId - ID of the teacher
- * @returns {Object|string} - Updated teacher object or error message
- */
-exports.adminUpdateTeacherProfileService = async (data, teacherId) => {
-  const { program, classLevel, academicYear, subject } = data;
-
-  // Checking if the teacher exists
-  const teacherExist = await Teacher.findById(teacherId);
-  if (!teacherExist) return "No such teacher found";
-
-  // Check if teacher is withdrawn
-  if (teacherExist.isWithdrawn) return "Action denied, teacher is withdrawn";
-
-  // Updating program
-  if (program) {
-    teacherExist.program = program;
-    await teacherExist.save();
-  }
-
-  // Updating classLevel
-  if (classLevel) {
-    teacherExist.classLevel = classLevel;
-    await teacherExist.save();
-  }
-
-  // Updating academic year
-  if (academicYear) {
-    teacherExist.academicYear = academicYear;
-    await teacherExist.save();
-  }
-
-  // Updating subject
-  if (subject) {
-    teacherExist.subject = subject;
-    await teacherExist.save();
-  }
-
-  return teacherExist;
-};
-
-// Delete teacher account (No implementation provided)
-// exports.deleteTeacherAccountService = async () => {};

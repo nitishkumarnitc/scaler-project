@@ -6,6 +6,7 @@ const {
 const responseStatus = require("../../handlers/response_status.handler");
 const Admin = require("../../models/Staff/admin.model");
 const generateToken = require("../../utils/token_generator");
+const redisClient = require("../../config/redis_connect"); // Assuming you have a Redis client set up
 
 /**
  * Register admin service.
@@ -31,6 +32,8 @@ exports.registerAdminService = async (data, res) => {
       email,
       password: await hashPassword(password),
     });
+    // Invalidate the cache
+    await redisClient.del("admins");
     return responseStatus(res, 201, "success", "Registration Successful!");
   }
 };
@@ -45,6 +48,7 @@ exports.registerAdminService = async (data, res) => {
  */
 exports.loginAdminService = async (data, res) => {
   const { email, password } = data;
+
   // Find the admin user by email
   const user = await Admin.findOne({ email });
   if (!user)
@@ -77,8 +81,22 @@ exports.loginAdminService = async (data, res) => {
  *
  * @returns {Array} - An array of all admin users.
  */
-exports.getAdminsService = async () => {
-  return Admin.find({}).select("-password -createdAt -updatedAt");
+exports.getAdminsService = async (res) => {
+  const cacheKey = "admins";
+
+  // Check the cache for admins
+  const cachedAdmins = await redisClient.get(cacheKey);
+  if (cachedAdmins) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedAdmins));
+  }
+
+  // Retrieve from the database if not cached
+  const admins = await Admin.find({}).select("-password -createdAt -updatedAt");
+
+  // Cache the result
+  await redisClient.set(cacheKey, JSON.stringify(admins), "EX", 3600); // Cache for 1 hour
+
+  return responseStatus(res, 200, "success", admins);
 };
 
 /**
@@ -88,19 +106,29 @@ exports.getAdminsService = async () => {
  * @returns {Object} - The admin user profile or an error message.
  */
 exports.getSingleProfileService = async (id, res) => {
+  const cacheKey = `admin:${id}`;
+
+  // Check the cache first
+  const cachedUser = await redisClient.get(cacheKey);
+  if (cachedUser) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedUser));
+  }
+
   const user = await Admin.findOne({ _id: id })
-    .select("-password -createdAt -updatedAt")
-    .populate("academicTerms")
-    .populate("programs")
-    .populate("academicYears")
-    .populate("yearGroups")
-    .populate("teachers")
-    .populate("classLevel")
-    .populate("students");
+      .select("-password -createdAt -updatedAt")
+      .populate("academicTerms")
+      .populate("programs")
+      .populate("academicYears")
+      .populate("yearGroups")
+      .populate("teachers")
+      .populate("classLevel")
+      .populate("students");
 
   if (!user) {
     return responseStatus(res, 201, "failed", "Admin doesn't exist ");
   } else {
+    // Cache the result
+    await redisClient.set(cacheKey, JSON.stringify(user), "EX", 3600); // Cache for 1 hour
     return responseStatus(res, 201, "success", user);
   }
 };
@@ -121,24 +149,33 @@ exports.updateAdminService = async (id, data, res) => {
   // Check if the updated email already exists
   const emailTaken = await Admin.findOne({ email });
   if (emailTaken) {
-    return "Email is already in use";
+    return responseStatus(res, 401, "failed", "Email is already in use");
   }
 
+  let updateResult;
   if (password) {
     // If password is provided, update it
-    const updateResult = await Admin.findByIdAndUpdate(
-      id,
-      { name, email, password: await hashPassword(password) },
-      { new: true }
+    updateResult = await Admin.findByIdAndUpdate(
+        id,
+        { name, email, password: await hashPassword(password) },
+        { new: true }
     ).select("-password -createdAt -updatedAt");
-    return responseStatus(res, 201, "success", updateResult);
   } else {
     // If no password provided, update only email and name
-    const findAdminAndUpdate = await Admin.findByIdAndUpdate(
-      id,
-      { email, name },
-      { new: true }
+    updateResult = await Admin.findByIdAndUpdate(
+        id,
+        { email, name },
+        { new: true }
     ).select("-password -createdAt -updatedAt");
-    return responseStatus(res, 201, "success", findAdminAndUpdate);
   }
+
+  if (!updateResult) {
+    return responseStatus(res, 404, "failed", "Admin not found");
+  }
+
+  // Invalidate the cache for the updated admin
+  await redisClient.del(`admin:${id}`);
+  await redisClient.del("admins"); // Optional: Clear all admins cache
+
+  return responseStatus(res, 201, "success", updateResult);
 };
