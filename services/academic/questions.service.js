@@ -28,11 +28,12 @@ exports.createQuestionsService = async (data, examId, teacherId, res) => {
 
   // Finding duplicate question
   const isQuestion = await Questions.findOne({ question });
-  if (!isQuestion)
+  if (isQuestion) {
     return responseStatus(res, 405, "failed", "This Question already exists");
+  }
 
   // Create question
-  const createQuestions = await Questions.create({
+  const createQuestions = await Questions.createQuestion({
     question,
     optionA,
     optionB,
@@ -54,7 +55,7 @@ exports.createQuestionsService = async (data, examId, teacherId, res) => {
  * @returns {Array} - An array of all questions.
  */
 exports.getAllQuestionsService = async () => {
-  return await Questions.find();
+  return await Questions.getAllQuestions();
 };
 
 /**
@@ -64,7 +65,7 @@ exports.getAllQuestionsService = async () => {
  * @returns {Object} - The question object.
  */
 exports.getQuestionsByIdService = async (questionId) => {
-  return await Questions.findById(questionId);
+  return await Questions.getQuestionById(questionId);
 };
 
 /**
@@ -87,25 +88,35 @@ exports.updateQuestionsService = async (data, questionId, userId, res) => {
 
   // Check if the updated question already exists
   const questionFound = await Questions.findOne({ question });
-  if (questionFound)
+  if (questionFound) {
     return responseStatus(res, 401, "failed", "Question already exists");
+  }
 
   // Update the question
-  const questionCreate = await Questions.findByIdAndUpdate(
-    questionId,
-    {
-      question,
-      optionA,
-      optionB,
-      optionC,
-      optionD,
-      correctAnswer,
-      createdBy: userId,
-    },
-    {
-      new: true,
-    }
-  );
+  const questionCreate = await Questions.updateQuestion(questionId, {
+    question,
+    optionA,
+    optionB,
+    optionC,
+    optionD,
+    correctAnswer,
+    createdBy: userId,
+  });
 
   return responseStatus(res, 201, "success", questionCreate);
+};
+
+/**
+ * Delete question service.
+ *
+ * @param {string} questionId - The ID of the question to be deleted.
+ * @param {Object} res - The response object.
+ * @returns {Object} - The response object indicating success or failure.
+ */
+exports.deleteQuestionService = async (questionId, res) => {
+  const deletedQuestion = await Questions.deleteQuestion(questionId);
+  if (!deletedQuestion) {
+    return responseStatus(res, 404, "failed", "Question not found");
+  }
+  return responseStatus(res, 200, "success", deletedQuestion);
 };

@@ -1,9 +1,8 @@
 // Import necessary models
 const Subject = require("../../models/Academic/subject.model");
-// const ClassLevel = require("../../models/Academic/class.model");
 const Program = require("../../models/Academic/program.model");
-// Import responseStatus handler
 const responseStatus = require("../../handlers/response_status.handler");
+const redisClient = require("../../config/redis_connect"); // Ensure Redis is configured
 
 /**
  * Create Subject service.
@@ -16,34 +15,38 @@ const responseStatus = require("../../handlers/response_status.handler");
  * @param {string} userId - The ID of the user creating the Subject.
  * @returns {Object} - The response object indicating success or failure.
  */
-exports.createSubjectService = async (data, programId, userId) => {
+exports.createSubjectService = async (data, programId, userId, res) => {
   const { name, description, academicTerm } = data;
 
   // Find the program
   const programFound = await Program.findById(programId);
-  if (!programFound)
-    return responseStatus(res, 402, "failed", "Program not found");
+  if (!programFound) {
+    return responseStatus(res, 404, "failed", "Program not found");
+  }
 
   // Check if the Subject already exists
-  const SubjectFound = await Subject.findOne({ name });
-  if (SubjectFound) {
-    return responseStatus(res, 402, "failed", "Subject already exists");
+  const subjectExists = await Subject.findOne({ name });
+  if (subjectExists) {
+    return responseStatus(res, 409, "failed", "Subject already exists");
   }
 
   // Create the Subject
-  const SubjectCreated = await Subject.create({
+  const subjectCreated = await Subject.create({
     name,
     description,
     academicTerm,
     createdBy: userId,
   });
 
-  // Push the object ID to program
-  programFound.subjects.push(SubjectCreated._id);
+  // Update the program with the new Subject ID
+  programFound.subjects.push(subjectCreated._id);
   await programFound.save();
 
+  // Invalidate cache
+  await redisClient.del("subjects");
+
   // Send the response
-  return responseStatus(res, 200, "success", SubjectCreated);
+  return responseStatus(res, 201, "success", subjectCreated);
 };
 
 /**
@@ -51,18 +54,46 @@ exports.createSubjectService = async (data, programId, userId) => {
  *
  * @returns {Array} - An array of all Subjects.
  */
-exports.getAllSubjectsService = async () => {
-  return await Subject.find();
+exports.getAllSubjectsService = async (res) => {
+  const cacheKey = "subjects";
+
+  // Check cache first
+  const cachedSubjects = await redisClient.get(cacheKey);
+  if (cachedSubjects) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedSubjects));
+  }
+
+  // If not in cache, retrieve from DB
+  const subjects = await Subject.find();
+  await redisClient.set(cacheKey, JSON.stringify(subjects)); // Cache the result
+
+  return responseStatus(res, 200, "success", subjects);
 };
 
 /**
  * Get a single Subject by ID service.
  *
  * @param {string} id - The ID of the Subject.
+ * @param {Object} res - The response object.
  * @returns {Object} - The Subject object.
  */
-exports.getSubjectsService = async (id) => {
-  return await Subject.findById(id);
+exports.getSubjectByIdService = async (id, res) => {
+  const cacheKey = `subject:${id}`;
+
+  // Check cache first
+  const cachedSubject = await redisClient.get(cacheKey);
+  if (cachedSubject) {
+    return responseStatus(res, 200, "success", JSON.parse(cachedSubject));
+  }
+
+  // If not in cache, retrieve from DB
+  const subject = await Subject.findById(id);
+  if (!subject) {
+    return responseStatus(res, 404, "failed", "Subject not found");
+  }
+
+  await redisClient.set(cacheKey, JSON.stringify(subject)); // Cache the result
+  return responseStatus(res, 200, "success", subject);
 };
 
 /**
@@ -76,39 +107,55 @@ exports.getSubjectsService = async (id) => {
  * @param {string} userId - The ID of the user updating the Subject.
  * @returns {Object} - The response object indicating success or failure.
  */
-exports.updateSubjectService = async (data, id, userId) => {
+exports.updateSubjectService = async (data, id, userId, res) => {
   const { name, description, academicTerm } = data;
 
   // Check if the updated name already exists
-  const classFound = await Subject.findOne({ name });
-  if (classFound) {
-    return responseStatus(res, 402, "failed", "Subject already exists");
+  const subjectExists = await Subject.findOne({ name });
+  if (subjectExists) {
+    return responseStatus(res, 409, "failed", "Subject already exists");
   }
 
   // Update the Subject
-  const Subjects = await Subject.findByIdAndUpdate(
-    id,
-    {
-      name,
-      description,
-      academicTerm,
-      createdBy: userId,
-    },
-    {
-      new: true,
-    }
+  const updatedSubject = await Subject.findByIdAndUpdate(
+      id,
+      {
+        name,
+        description,
+        academicTerm,
+        createdBy: userId,
+      },
+      { new: true }
   );
 
+  if (!updatedSubject) {
+    return responseStatus(res, 404, "failed", "Subject not found");
+  }
+
+  // Invalidate cache
+  await redisClient.del("subjects");
+  await redisClient.del(`subject:${id}`);
+
   // Send the response
-  return responseStatus(res, 200, "success", Subjects);
+  return responseStatus(res, 200, "success", updatedSubject);
 };
 
 /**
  * Delete Subject data service.
  *
  * @param {string} id - The ID of the Subject to be deleted.
- * @returns {Object} - The deleted Subject object.
+ * @param {Object} res - The response object.
+ * @returns {Object} - The deleted Subject object or response indicating failure.
  */
-exports.deleteSubjectService = async (id) => {
-  return await Subject.findByIdAndDelete(id);
+exports.deleteSubjectService = async (id, res) => {
+  const deletedSubject = await Subject.findByIdAndDelete(id);
+  if (!deletedSubject) {
+    return responseStatus(res, 404, "failed", "Subject not found");
+  }
+
+  // Invalidate cache
+  await redisClient.del("subjects");
+  await redisClient.del(`subject:${id}`);
+
+  return responseStatus(res, 200, "success", deletedSubject);
 };

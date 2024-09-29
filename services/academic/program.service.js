@@ -20,7 +20,7 @@ exports.createProgramService = async (data, userId) => {
   // Check if the program already exists
   const programFound = await Program.findOne({ name });
   if (programFound) {
-    return responseStatus(res, 402, "failed", "Program already exists");
+    return responseStatus(402, "failed", "Program already exists");
   }
 
   // Create the program
@@ -36,8 +36,11 @@ exports.createProgramService = async (data, userId) => {
   // Save the changes
   await admin.save();
 
+  // Clear the cache
+  await redisClient.del("programs_cache");
+
   // Send the response
-  return responseStatus(res, 200, "success", programCreated);
+  return responseStatus(200, "success", programCreated);
 };
 
 /**
@@ -46,7 +49,7 @@ exports.createProgramService = async (data, userId) => {
  * @returns {Array} - An array of all programs.
  */
 exports.getAllProgramsService = async () => {
-  return await Program.find();
+  return await Program.getAllPrograms(); // Using the caching method from the model
 };
 
 /**
@@ -73,26 +76,29 @@ exports.updateProgramService = async (data, id, userId) => {
   const { name, description } = data;
 
   // Check if the updated name already exists
-  const classFound = await ClassLevel.findOne({ name });
-  if (classFound) {
-    return responseStatus(res, 402, "failed", "Program already exists");
+  const programFound = await Program.findOne({ name });
+  if (programFound) {
+    return responseStatus(402, "failed", "Program already exists");
   }
 
   // Update the program
-  const programs = await Program.findByIdAndUpdate(
-    id,
-    {
-      name,
-      description,
-      createdBy: userId,
-    },
-    {
-      new: true,
-    }
+  const programUpdated = await Program.findByIdAndUpdate(
+      id,
+      {
+        name,
+        description,
+        createdBy: userId,
+      },
+      {
+        new: true,
+      }
   );
 
+  // Clear the cache
+  await redisClient.del("programs_cache");
+
   // Send the response
-  return responseStatus(res, 200, "success", programs);
+  return responseStatus(200, "success", programUpdated);
 };
 
 /**
@@ -102,5 +108,7 @@ exports.updateProgramService = async (data, id, userId) => {
  * @returns {Object} - The deleted program object.
  */
 exports.deleteProgramService = async (id) => {
+  // Clear the cache before deletion
+  await redisClient.del("programs_cache");
   return await Program.findByIdAndDelete(id);
 };
