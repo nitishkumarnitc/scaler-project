@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 require("colors");
+const uri = process.env.DB;
 
 const dbConnect = async () => {
   await mongoose
-    .connect(process.env.DB)
+    .connect(uri)
     .then(() => {
       console.log("Database connected! ".yellow.bold);
     })
