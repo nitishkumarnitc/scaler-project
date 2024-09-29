@@ -55,12 +55,8 @@ exports.getClassLevelController = async (req, res) => {
  **/
 exports.updateClassLevelController = async (req, res) => {
   try {
-    await updateClassLevelService(
-      req.body,
-      req.params.id,
-      req.userAuth.id,
-      res
-    );
+    const { body, params, userAuth } = req;
+    await updateClassLevelService(body, params.id, userAuth.id, res);
   } catch (error) {
     responseStatus(res, 400, "failed", error.message);
   }

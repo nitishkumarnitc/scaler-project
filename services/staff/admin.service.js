@@ -24,18 +24,21 @@ exports.registerAdminService = async (data, res) => {
   const isAdminExist = await Admin.findOne({ email });
 
   if (isAdminExist) {
-    return responseStatus(res, 401, "failed", "Email Already in use");
+    responseStatus(res, 401, "error", "This email is already registered.");
   } else {
-    // Create a new admin
+    // Register a new admin
     await Admin.create({
       name,
       email,
       password: await hashPassword(password),
     });
-    // Invalidate the cache
+  
+    // Clear the admin cache
     await redisClient.del("admins");
-    return responseStatus(res, 201, "success", "Registration Successful!");
+  
+    responseStatus(res, 201, "success", "Admin registration completed successfully!");
   }
+  
 };
 
 /**
@@ -58,22 +61,23 @@ exports.loginAdminService = async (data, res) => {
   const isPassValid = await isPassMatched(password, user.password);
 
   if (isPassValid) {
-    // Generate a token and verify it
+    // Create a token for the user
     const token = generateToken(user._id);
-    const result = {
+    const responseData = {
       user: {
-        _id: user._id,
+        id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
       },
       token,
     };
-    // Return user, token, and verification status
-    return responseStatus(res, 200, "success", result);
+    // Send back the user data and authentication token
+    responseStatus(res, 200, "success", responseData);
   } else {
-    return responseStatus(res, 405, "failed", "Invalid login credentials");
+    responseStatus(res, 405, "error", "Incorrect login details provided.");
   }
+  
 };
 
 /**

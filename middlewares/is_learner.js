@@ -7,7 +7,7 @@ const isInstructor = async (req, res, next) => {
   if (instructor?.role === "learner") {
     next();
   } else {
-    responseStatus(res, 403, "failed", "Access Denied.instructors only route!");
+    responseStatus(res, 403, "failed",  "Access restricted to instructors only.");
   }
 };
 module.exports = isInstructor;
